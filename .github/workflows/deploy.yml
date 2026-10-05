@@ -165,6 +165,7 @@ jobs:
 
             await page.reload({waitUntil:'networkidle'});
             await page.locator('#startBtn').click({force:true});
+            await page.locator('#modes .choice[data-v="pve"]').click({force:true});
             await page.locator('#begin').click({force:true});
             for (let player = 0; player < 2; player++) {
               await page.waitForTimeout(1750);
