@@ -185,3 +185,21 @@ body.phaseTransition::after{content:"";position:fixed;inset:0;z-index:9997;backg
 @keyframes shieldSpin{from{transform:rotate(0deg) scale(.9)}to{transform:rotate(360deg) scale(1.08)}}
 @keyframes upArrow{from{transform:translate(-50%,0);opacity:0}to{transform:translate(-50%,-22px);opacity:0}}
 @keyframes downArrow{from{transform:translate(-50%,0);opacity:0}to{transform:translate(-50%,12px);opacity:0}}
+
+/* === BATTLEFIELD COMPOSITION PREVIEW === */
+.battlefieldPreview{margin:14px 0 18px;padding:14px;border:1px solid rgba(100,190,255,.24);border-radius:18px;background:linear-gradient(145deg,rgba(70,150,255,.075),rgba(7,13,28,.78));box-shadow:inset 0 0 30px rgba(70,160,255,.035)}
+.battlefieldPreviewHead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
+.fieldPreview{display:grid;grid-template-columns:repeat(5,minmax(0,1fr)) minmax(115px,.72fr);gap:8px;align-items:stretch}
+.fieldPreviewSlot,.fieldPreviewLeader{min-height:92px;border:1px solid rgba(255,255,255,.12);border-radius:12px;overflow:hidden;position:relative;background:rgba(255,255,255,.025)}
+.fieldPreviewSlot.empty,.fieldPreviewLeader.empty{display:grid;place-items:center;text-align:center;border-style:dashed;color:#71819b;font-size:11px;background:rgba(0,0,0,.12)}
+.fieldPreviewSlot.filled,.fieldPreviewLeader:not(.empty){padding:8px;border-color:rgba(120,205,255,.28);box-shadow:inset 0 0 20px rgba(70,160,255,.045)}
+.fieldPreviewLeader:not(.empty){border-color:rgba(255,215,106,.38);box-shadow:inset 0 0 22px rgba(255,215,106,.05)}
+.fieldPreviewCard{display:flex;flex-direction:column;justify-content:center;height:100%;min-width:0}
+.fieldPreviewCard .previewName{font-weight:900;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fieldPreviewCard .previewAttr{font-size:9px;color:#7cc9ff;margin-top:4px}
+.fieldPreviewCard .previewStars{font-size:9px;color:var(--gold);margin-top:3px}
+.fieldPreviewCard .previewHp{font-size:9px;color:#aab9cf;margin-top:5px}
+.fieldPreviewLeader .previewAttr{color:#ffe18a}
+.fieldPreviewLeader .previewBadge{font-size:8px;color:#241804;background:#ffd76a;border-radius:999px;padding:2px 5px;display:inline-block;margin-bottom:5px;font-weight:900}
+@media(max-width:760px){.fieldPreview{grid-template-columns:repeat(5,minmax(72px,1fr));overflow-x:auto;padding-bottom:4px}.fieldPreviewLeader{grid-column:1/-1;min-height:72px}.fieldPreviewSlot{min-width:72px}}
+@media(max-width:500px){.battlefieldPreview{padding:11px}.battlefieldPreviewHead{align-items:flex-start}.fieldPreview{gap:6px}.fieldPreviewSlot{min-height:82px}.fieldPreviewCard .previewName{font-size:10px}}
