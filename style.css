@@ -6,6 +6,7 @@
 .card{position:relative;transform-style:preserve-3d;transition:transform .22s cubic-bezier(.2,.8,.2,1),box-shadow .22s,filter .22s}
 .card.clickable:hover{transform:translateY(-6px) scale(1.025)}
 .card.selected{transform:translateY(-10px) rotateX(2deg) scale(1.035);box-shadow:0 0 0 2px rgba(99,190,255,.8),0 18px 45px rgba(0,0,0,.45)}
+.card.faceDown{transform:rotateY(180deg);filter:brightness(.55)}
 .card.reveal{animation:cardReveal .72s cubic-bezier(.18,.82,.25,1) both}
 .card.attacker{animation:cardAttack .42s ease both;z-index:5}
 .card.hit{animation:cardHit .45s ease both}
