@@ -117,7 +117,7 @@ body.phaseTransition::after{content:"";position:fixed;inset:0;z-index:9997;backg
 .leaderChoiceWrap[hidden]{display:none}
 .leaderSelectGrid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-top:10px}
 .leaderSelectGrid .card{cursor:pointer;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
-.leaderSelectGrid .card.selected{transform:translateY(-7px) scale(1.025);border-color:#fff0a8;box-shadow:0 0 0 2px rgba(255,215,106,.34),0 0 30px rgba(255,215,106,.2)}
+.leaderSelectGrid .card.selected{transform:translateY(-7px) scale(1.025);border-color:#fff0a8;box-shadow:0 0 0 2px rgba(255,215,106,.34),0 0 30px rgba(255,215,106,.2)}.leaderNoneBtn{grid-column:1/-1;padding:10px 14px;border:1px dashed rgba(255,255,255,.2);border-radius:10px;background:rgba(255,255,255,.035);color:#b9c8dc;cursor:pointer;font-weight:700}.leaderNoneBtn:hover{border-color:rgba(255,215,106,.45);color:#fff0b0;background:rgba(255,215,106,.06)}
 @media(max-width:600px){.leaderSelectGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 
