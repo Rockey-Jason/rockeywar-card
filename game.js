@@ -443,7 +443,11 @@ function renderBattle(){
 
   $("arena").innerHTML=S.players.map((p,pi)=>{
     const cards=all(p).map(c=>{
-      let h=cardHTML(c,(pi===S.active&&c.alive)||(S.pending&&selectableCards().has(c)));
+      const isPendingTarget=!!(S.pending&&selectableCards().has(c));
+      const isActiveCard=pi===S.active&&c.alive;
+      let h=cardHTML(c,isActiveCard||isPendingTarget);
+      if(isPendingTarget)h=h.replace('class="card','class="card targetSelectable targetPending');
+      else if(isActiveCard)h=h.replace('class="card','class="card battlefieldActive');
       return h.replace('data-card="'+c.id+'"','data-card="'+c.id+'" data-pi="'+pi+'"');
     }).join("");
 
@@ -464,7 +468,7 @@ function renderBattle(){
         if(c&&selectableCards().has(c)){
           const pending=S.pending;
           clearPending();
-          pending.cb({p:S.players[pi],c});
+          pending.cb(c);
           render();
         }
         return;
