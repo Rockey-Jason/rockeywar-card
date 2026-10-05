@@ -289,7 +289,36 @@ function buyPotion(p){if(p.coins<5){toast("코인 부족");return}const targets=
 function buyCharacter(p){if(p.coins<3){toast("코인 부족");return}p.coins-=3;let c=drawChar();p.reserve.push(c);fxBuy();toast(c.name+" 획득 · 예비 카드에 보관");setTimeout(()=>renderShop(),280)}
 function buyRandomLeader(p){if(p.coins<7||!S.leaderDeck.length){toast("구매 불가");return}p.coins-=7;p.leaderStock.push(drawLeader());fxBuy();toast("랜덤 지도자 획득");setTimeout(()=>renderShop(),280)}
 function buyChosenLeader(p){if(p.coins<12||!S.leaderDeck.length){toast("구매 불가");return}p.coins-=12;showModal("지도자 선택",'<div class="selectGrid">'+S.leaderDeck.map((l,i)=>cardHTML(l,true).replace('data-card="'+l.id+'"','data-card="'+l.id+'" data-li="'+i+'"')).join("")+'</div>');$("modalBody").querySelectorAll(".card").forEach(e=>e.onclick=()=>{let l=S.leaderDeck.splice(+e.dataset.li,1)[0];p.leaderStock.push(l);shuffle(S.leaderDeck);closeModal();fxBuy();setTimeout(()=>renderShop(),280)})}
-function renderShop(){go("shop");let p=S.players[S.active];$("shopInfo").textContent=p.name+"의 구매 차례 · 구매 후 다음 플레이어로 진행";$("shopCoins").textContent="◆ "+p.coins+" 코인";let arr=[["아이템",1,"아이템 더미 맨 위 1장. 한 구매 단계에서 최대 3회.",()=>buyItem(p)],["물약",5,"아군 캐릭터/지도자 1장의 기본 HP로 회복.",()=>buyPotion(p)],["캐릭터",3,"캐릭터 더미 맨 위 1장. 예비 카드로 보관.",()=>buyCharacter(p)],["랜덤 지도자",7,"지도자 더미 맨 위 1장.",()=>buyRandomLeader(p)],["지도자",12,"지도자 더미에서 원하는 지도자를 확인해 선택하고 나머지는 셔플.",()=>buyChosenLeader(p)]];$("shopGrid").innerHTML=arr.map((x,i)=>'<div class="shop"><h3>'+x[0]+'</h3><div class="price">'+x[1]+' 코인</div><p>'+x[2]+'</p><button class="btn primary" data-buy="'+i+'">구매</button></div>').join("");$("shopGrid").querySelectorAll("button").forEach(b=>b.onclick=()=>{let i=+b.dataset.buy;if(i===0){if((p.shopItems||0)>=3){toast("아이템은 구매 단계당 최대 3개");return}if(p.coins<1){toast("코인 부족");return}p.shopItems=(p.shopItems||0)+1;buyItem(p)}else if(i===1)buyPotion(p);else if(i===2)buyCharacter(p);else if(i===3)buyRandomLeader(p);else buyChosenLeader(p)})}
+function aiShopTurn(p){
+  if(!isAI(p.id)||S.phase!=="shop")return;
+  let purchases=0;
+  const spend=()=>{
+    if(S.phase!=="shop"||S.active!==p.id)return;
+    // AI는 생존 안정성 → 지도자 → 전투력 순으로 구매한다.
+    if(p.coins>=7&&!p.leader&&!p.leaderStock.length&&S.leaderDeck.length){
+      const candidates=S.leaderDeck.slice().sort((a,b)=>{
+        const aa=p.field.filter(c=>c.attr===a.attr).length,bb=p.field.filter(c=>c.attr===b.attr).length;
+        return (b.star*6+bb*9+b.baseHp*.08)-(a.star*6+aa*9+a.baseHp*.08);
+      });
+      const l=candidates[0];
+      S.leaderDeck=S.leaderDeck.filter(x=>x!==l);
+      p.leaderStock.push(l);
+      p.coins-=7;fxBuy();log("🤖 AI 구매 · 랜덤 지도자: "+l.name);p.aiPurchased=true;
+      return setTimeout(spend,360);
+    }
+    if(p.coins>=1&&(p.shopItems||0)<3){
+      const it=drawItem();
+      if(it){p.items.push(it);p.coins--;p.shopItems=(p.shopItems||0)+1;fxBuy();log("🤖 AI 구매 · 아이템: "+it.name);return setTimeout(spend,300)}
+    }
+    if(p.coins>=3&&p.reserve.length<2){
+      p.coins-=3;p.reserve.push(drawChar());fxBuy();log("🤖 AI 구매 · 캐릭터");return setTimeout(spend,300);
+    }
+    p.shopItems=0;
+    nextShop();
+  };
+  setTimeout(spend,520);
+}
+function renderShop(){go("shop");let p=S.players[S.active];if(isAI(S.active)){aiShopTurn(p);return}$("shopInfo").textContent=p.name+"의 구매 차례 · 구매 후 다음 플레이어로 진행";$("shopCoins").textContent="◆ "+p.coins+" 코인";let arr=[["아이템",1,"아이템 더미 맨 위 1장. 한 구매 단계에서 최대 3회.",()=>buyItem(p)],["물약",5,"아군 캐릭터/지도자 1장의 기본 HP로 회복.",()=>buyPotion(p)],["캐릭터",3,"캐릭터 더미 맨 위 1장. 예비 카드로 보관.",()=>buyCharacter(p)],["랜덤 지도자",7,"지도자 더미 맨 위 1장.",()=>buyRandomLeader(p)],["지도자",12,"지도자 더미에서 원하는 지도자를 확인해 선택하고 나머지는 셔플.",()=>buyChosenLeader(p)]];$("shopGrid").innerHTML=arr.map((x,i)=>'<div class="shop"><h3>'+x[0]+'</h3><div class="price">'+x[1]+' 코인</div><p>'+x[2]+'</p><button class="btn primary" data-buy="'+i+'">구매</button></div>').join("");$("shopGrid").querySelectorAll("button").forEach(b=>b.onclick=()=>{let i=+b.dataset.buy;if(i===0){if((p.shopItems||0)>=3){toast("아이템은 구매 단계당 최대 3개");return}if(p.coins<1){toast("코인 부족");return}p.shopItems=(p.shopItems||0)+1;buyItem(p)}else if(i===1)buyPotion(p);else if(i===2)buyCharacter(p);else if(i===3)buyRandomLeader(p);else buyChosenLeader(p)})}
 function nextShop(){let p=S.players[S.active];document.body.classList.add("phaseTransition");setTimeout(()=>document.body.classList.remove("phaseTransition"),650);p.shopItems=0;let idx=S.initiative.indexOf(S.active),next=S.initiative[(idx+1)%S.initiative.length];if(next===S.initiative[0]){S.players.forEach(x=>{x.field=x.field.filter(c=>c.alive);if(!x.deck.length&&x.removedUntilEmpty?.length){x.deck.push(...x.removedUntilEmpty.splice(0));shuffle(x.deck)}while(x.field.length<5&&x.deck.length)x.field.push(x.deck.shift());if(x.leaderStock?.length){x.leader=x.leaderStock.pop()}});S.active=next;beginComposition()}else{S.active=next;renderShop()}}
 function start(){S={...S,players:[],charDeck:buildCharDeck(),leaderDeck:buildLeaderDeck(),itemDeck:buildItemDeck(),initiative:[],turn:1,round:1,active:0,phase:"setup",compositionIndex:0,selected:[],pending:null,gameOver:false};for(let i=0;i<S.count;i++){let hand=[];for(let j=0;j<26;j++)hand.push(S.charDeck.pop());S.players.push({id:i,name:S.mode==="pve"&&i===S.count-1?"AI":"플레이어 "+(i+1),hand,field:[],deck:[],reserve:[],discard:[],leader:null,leaderStock:[],removedUntilEmpty:[],items:[],coins:0,score:0,status:{},dealing:false,initialDealAnimated:false})}let scores=S.players.map(p=>Math.max(...p.hand.map(c=>c.star)));let guard=0;while(new Set(scores).size<S.players.length&&guard++<10000){const groups=new Map();scores.forEach((v,i)=>{if(!groups.has(v))groups.set(v,[]);groups.get(v).push(i)});for(const ids of groups.values())if(ids.length>1)ids.forEach(i=>{scores[i]=S.players[i].hand[Math.floor(Math.random()*S.players[i].hand.length)].star})}if(new Set(scores).size<S.players.length){let used=new Set();for(let i=0;i<scores.length;i++){while(used.has(scores[i]))scores[i]=1+Math.floor(Math.random()*5);used.add(scores[i])}}let order=scores.map((star,i)=>({i,star})).sort((a,b)=>b.star-a.star).map(x=>x.i);S.initiative=order;log("선공 순서: "+order.map(i=>S.players[i].name).join(" → "));beginComposition()}
 function init(){document.querySelectorAll("#modes .choice").forEach(e=>e.onclick=()=>{document.querySelectorAll("#modes .choice").forEach(x=>x.classList.remove("selected"));e.classList.add("selected");S.mode=e.dataset.v;updatePreview()});document.querySelectorAll("#counts .choice").forEach(e=>e.onclick=()=>{document.querySelectorAll("#counts .choice").forEach(x=>x.classList.remove("selected"));e.classList.add("selected");S.count=+e.dataset.v;updatePreview()});$("startBtn").onclick=()=>{go("setup");updatePreview()};$("begin").onclick=start;$("again").onclick=()=>{go("setup");updatePreview()};$("homeBtn").onclick=()=>go("home");$("modalClose").onclick=closeModal;$("rulesBtn").onclick=()=>showModal("전체 규칙",rules());$("compReset").onclick=()=>{S.selected=[];renderComposition()};$("compDone").onclick=()=>{let p=S.players[S.compositionIndex];if(S.selected.length!==Math.min(5,p.hand.length)){toast("전장에 배치할 카드 수를 확인하세요.");return}finishComposition(S.compositionIndex)};$("shopDone").onclick=nextShop;updatePreview()}
