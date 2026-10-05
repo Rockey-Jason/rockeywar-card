@@ -123,3 +123,44 @@ body.phaseTransition::after{content:"";position:fixed;inset:0;z-index:9997;backg
 
 .selectionStatus{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:12px 0;padding:11px 14px;border:1px solid rgba(110,180,255,.22);border-radius:14px;background:rgba(8,16,36,.72);font-size:12px}.selectionCount{min-width:52px;text-align:center;padding:5px 9px;border-radius:999px;font-weight:900;color:#dff2ff;background:rgba(70,150,255,.14);border:1px solid rgba(120,190,255,.28)}#compSelectionNames{color:#aab9cf}.selectionStatus.ready{border-color:rgba(255,215,106,.5);box-shadow:0 0 20px rgba(255,215,106,.08)}
 #compCards .card.selected{transform:translateY(-10px) scale(1.035);border-color:#8fd8ff;box-shadow:0 0 0 2px rgba(120,205,255,.42),0 0 28px rgba(80,170,255,.22)}#compCards .card.selected::before{content:"✓ 선택됨";position:absolute;top:7px;right:7px;padding:4px 8px;border-radius:999px;background:linear-gradient(135deg,#dff6ff,#63b9ff);color:#06101d;font-size:9px;font-weight:900;z-index:3;box-shadow:0 0 14px rgba(100,200,255,.35)}
+
+
+/* === SKILL-SPECIFIC COMBAT FX === */
+.fxSkill{position:absolute;pointer-events:none;z-index:10000;font-weight:900;display:grid;place-items:center;transform:translate(-50%,-50%);text-shadow:0 0 16px currentColor}
+.fxFire{font-size:34px;animation:fxFire .65s ease-out forwards}.fxFireCore{font-size:18px;color:#fff;animation:fxFireCore .45s ease-out forwards}
+.fxLava{font-size:42px;color:#ff7b25;animation:fxLava .7s ease-out forwards}.fxMeteor{font-size:54px;animation:fxMeteor .72s cubic-bezier(.2,.7,.3,1) forwards}
+.fxIce{font-size:38px;color:#bdefff;animation:fxIce .72s ease-out forwards}.fxIceShard{font-size:26px;color:#e9fbff;animation:fxShard .55s ease-out forwards}
+.fxSnow{font-size:20px;color:#dff8ff;animation:fxSnow .75s ease-out forwards;animation-delay:calc(var(--i,0)*35ms)}
+.fxGlacier{font-size:58px;color:#9cecff;animation:fxGlacier .7s ease-out forwards}
+.fxWind{font-size:48px;color:#aee9ff;animation:fxWind .65s ease-out forwards}.fxTornado{font-size:58px;color:#b6f1ff;animation:fxTornado .8s ease-out forwards}
+.fxNature{font-size:34px;color:#9dffbf;animation:fxNature .65s ease-out forwards}.fxLeaf{font-size:25px;animation:fxLeaf .7s ease-out forwards}
+.fxEarth{font-size:42px;color:#d9b27c;animation:fxEarth .55s ease-out forwards}.fxSand{font-size:54px;color:#e5c47a;animation:fxSand .7s ease-out forwards}
+.fxSun{font-size:52px;color:#ffe889;animation:fxSun .7s ease-out forwards}.fxLeader{font-size:52px;color:#ffe68b;animation:fxLeader .65s ease-out forwards}
+.fxPhysical{font-size:38px;color:#e8efff;animation:fxPhysical .45s ease-out forwards}
+.fxImpact{position:absolute;width:70px;height:70px;border:2px solid currentColor;border-radius:50%;transform:translate(-50%,-50%) scale(.2);opacity:0;animation:fxImpact .45s ease-out forwards;pointer-events:none}
+.fxImpact-fire,.fxImpact-fireball,.fxImpact-lava,.fxImpact-meteor{color:#ff9b4a}.fxImpact-ice,.fxImpact-freeze,.fxImpact-blizzard,.fxImpact-glacier{color:#a9efff}
+.fxImpact-wind,.fxImpact-tornado{color:#aee9ff}.fxImpact-nature{color:#9dffbf}.fxImpact-earth{color:#d7b27c}.fxImpact-sand{color:#e8cb86}.fxImpact-sun,.fxImpact-leader{color:#ffe68b}.fxImpact-physical{color:#e8efff}
+.fxOverlay-fire,.fxOverlay-fireball,.fxOverlay-lava,.fxOverlay-meteor{background:radial-gradient(circle,rgba(255,90,20,.2),transparent 58%)}
+.fxOverlay-ice,.fxOverlay-freeze,.fxOverlay-blizzard,.fxOverlay-glacier{background:radial-gradient(circle,rgba(90,210,255,.2),transparent 58%)}
+.fxOverlay-wind,.fxOverlay-tornado{background:radial-gradient(circle,rgba(130,230,255,.13),transparent 58%)}
+.fxOverlay-nature{background:radial-gradient(circle,rgba(80,255,150,.12),transparent 58%)}
+.fxOverlay-earth,.fxOverlay-sand{background:radial-gradient(circle,rgba(220,170,90,.13),transparent 58%)}
+.fxOverlay-sun,.fxOverlay-leader{background:radial-gradient(circle,rgba(255,220,90,.16),transparent 58%)}
+@keyframes fxFire{0%{transform:translate(-50%,-50%) scale(.3) rotate(-20deg);opacity:0}25%{opacity:1}100%{transform:translate(-50%,-90px) scale(1.35) rotate(12deg);opacity:0}}
+@keyframes fxFireCore{0%{transform:translate(-50%,-50%) scale(.2);opacity:0}35%{opacity:1}100%{transform:translate(-50%,-50%) scale(3);opacity:0}}
+@keyframes fxLava{0%{transform:translate(-50%,-50%) scale(.2);opacity:0}35%{opacity:1}100%{transform:translate(-50%,-65px) scale(1.5) rotate(140deg);opacity:0}}
+@keyframes fxMeteor{0%{transform:translate(100px,-130px) scale(.45) rotate(-30deg);opacity:0}25%{opacity:1}100%{transform:translate(-50%,-50%) scale(1.5) rotate(25deg);opacity:0}}
+@keyframes fxIce{0%{transform:translate(-50%,-50%) scale(.2) rotate(-20deg);opacity:0}30%{opacity:1}100%{transform:translate(-50%,-80px) scale(1.45) rotate(25deg);opacity:0}}
+@keyframes fxShard{0%{transform:translate(-50%,-50%) scale(.2) rotate(0);opacity:0}30%{opacity:1}100%{transform:translate(35px,-55px) scale(1.6) rotate(130deg);opacity:0}}
+@keyframes fxSnow{0%{transform:translate(calc(-50% + var(--drift)), -15px) scale(.3);opacity:0}25%{opacity:1}100%{transform:translate(calc(-50% + var(--drift)), 65px) scale(1.2) rotate(180deg);opacity:0}}
+@keyframes fxGlacier{0%{transform:translate(-50%,-50%) scale(.2);opacity:0}35%{opacity:1}100%{transform:translate(-50%,-50%) scale(1.8);opacity:0}}
+@keyframes fxWind{0%{transform:translate(-90px,-50%) scale(.3) rotate(-70deg);opacity:0}35%{opacity:1}100%{transform:translate(70px,-50%) scale(1.5) rotate(220deg);opacity:0}}
+@keyframes fxTornado{0%{transform:translate(-50%,40px) scale(.2) rotate(0);opacity:0}30%{opacity:1}100%{transform:translate(-50%,-60px) scale(1.5) rotate(520deg);opacity:0}}
+@keyframes fxNature{0%{transform:translate(-50%,-50%) scale(.2);opacity:0}30%{opacity:1}100%{transform:translate(-50%,-70px) scale(1.3) rotate(180deg);opacity:0}}
+@keyframes fxLeaf{0%{transform:translate(-50%,-50%) rotate(-30deg);opacity:0}30%{opacity:1}100%{transform:translate(45px,-45px) rotate(220deg);opacity:0}}
+@keyframes fxEarth{0%{transform:translate(-50%,30px) scale(.2);opacity:0}35%{opacity:1}100%{transform:translate(-50%,-20px) scale(1.4) rotate(120deg);opacity:0}}
+@keyframes fxSand{0%{transform:translate(-50%,20px) scale(.2);opacity:0}30%{opacity:1}100%{transform:translate(45px,-40px) scale(1.5);opacity:0}}
+@keyframes fxSun{0%{transform:translate(-50%,-50%) scale(.2);opacity:0}30%{opacity:1}100%{transform:translate(-50%,-50%) scale(1.8);opacity:0}}
+@keyframes fxLeader{0%{transform:translate(-50%,-50%) scale(.25) rotate(-90deg);opacity:0}30%{opacity:1}100%{transform:translate(-50%,-50%) scale(1.6) rotate(90deg);opacity:0}}
+@keyframes fxPhysical{0%{transform:translate(-50%,-50%) scale(.2);opacity:0}30%{opacity:1}100%{transform:translate(-50%,-50%) scale(1.5) rotate(90deg);opacity:0}}
+@keyframes fxImpact{0%{transform:translate(-50%,-50%) scale(.15);opacity:0}25%{opacity:1}100%{transform:translate(-50%,-50%) scale(1.6);opacity:0}}
