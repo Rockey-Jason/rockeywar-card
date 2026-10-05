@@ -43,3 +43,21 @@
 @media (prefers-reduced-motion:reduce){.card,.fxText,.fxSlash,.fxBurst,.fxOverlay{animation:none!important;transition:none!important}}
 
 body.phaseTransition::after{content:"";position:fixed;inset:0;z-index:9997;background:radial-gradient(circle,rgba(70,170,255,.18),rgba(0,0,30,.72));pointer-events:none;animation:phaseFlash .65s ease both}@keyframes phaseFlash{0%{opacity:0}35%{opacity:1}100%{opacity:0}}
+
+/* 자연스러운 초기 카드 지급 연출 */
+.dealingPanel{position:relative;overflow:hidden}
+#compCards .card.deal-in{opacity:0;transform:translateY(-34px) scale(.94) rotate(var(--deal-rot,0deg));animation:dealCardIn .58s cubic-bezier(.2,.85,.25,1) forwards;animation-delay:calc(var(--deal-index,0) * 42ms)}
+#compCards .card.deal-in:nth-child(3n){--deal-rot:-1.5deg}
+#compCards .card.deal-in:nth-child(3n+1){--deal-rot:1.2deg}
+#compCards .card.deal-in:nth-child(3n+2){--deal-rot:-.6deg}
+.dealOverlay{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:linear-gradient(180deg,rgba(0,0,35,.18),rgba(0,0,16,.78));backdrop-filter:blur(3px);pointer-events:auto}
+.dealOverlay strong{font-size:1.15rem;letter-spacing:.02em}
+.dealOverlay span{font-size:.82rem;opacity:.7}
+.dealStack{position:relative;width:88px;height:64px;margin-bottom:4px}
+.dealCardBack{position:absolute;left:50%;top:50%;width:48px;height:68px;border-radius:8px;border:1px solid rgba(255,255,255,.28);background:linear-gradient(145deg,#17205c,#05051f);box-shadow:0 10px 28px rgba(0,0,0,.4);transform:translate(-50%,-50%)}
+.dealCardBack:nth-child(1){transform:translate(-50%,-50%) rotate(-9deg)}
+.dealCardBack:nth-child(2){transform:translate(-50%,-50%) rotate(2deg)}
+.dealCardBack:nth-child(3){transform:translate(-50%,-50%) rotate(11deg)}
+.dealCardBack:after{content:"⚔";position:absolute;inset:0;display:grid;place-items:center;color:rgba(255,255,255,.65);font-size:20px}
+@keyframes dealCardIn{0%{opacity:0;transform:translateY(-34px) scale(.94) rotate(var(--deal-rot,0deg))}65%{opacity:1;transform:translateY(5px) scale(1.015) rotate(var(--deal-rot,0deg))}100%{opacity:1;transform:translateY(0) scale(1) rotate(var(--deal-rot,0deg))}}
+@media (prefers-reduced-motion:reduce){#compCards .card.deal-in{animation:none;opacity:1;transform:none}.dealOverlay{backdrop-filter:none}}
