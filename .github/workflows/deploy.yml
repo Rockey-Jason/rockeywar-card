@@ -66,7 +66,7 @@ jobs:
 
             step('begin battle setup');
             await page.locator('#begin').click({force:true});
-            await page.waitForTimeout(150);
+            await page.waitForTimeout(1750);
             if (!(await active('#composition'))) throw new Error('전쟁 시작 후 구성 화면이 열리지 않습니다.');
 
             for (let player = 0; player < 2; player++) {
@@ -80,14 +80,7 @@ jobs:
               step('composition done ' + player);
               await page.locator('#compDone').click({force:true});
               await page.waitForTimeout(120);
-
-              if (await page.locator('#modal.show').count()) {
-                const leaderCards = page.locator('#modal.show .card');
-                if (await leaderCards.count() === 0) throw new Error('지도자 선택 카드가 없습니다. player=' + player);
-                step('leader choice ' + player);
-                await leaderCards.first().click({force:true});
-                await page.waitForTimeout(120);
-              }
+              if (await page.locator('#modal.show').count()) throw new Error('첫 게임 시작에서 지도자 선택이 나타나면 안 됩니다. player=' + player);
             }
 
             if (!(await active('#battle'))) throw new Error('2명의 구성이 끝난 뒤 전투 화면으로 이동하지 않습니다.');
@@ -122,13 +115,11 @@ jobs:
             await page.locator('#counts .choice[data-v="4"]').click({force:true});
             await page.locator('#begin').click({force:true});
             for (let player = 0; player < 4; player++) {
+              await page.waitForTimeout(1750);
               for (let i = 0; i < 5; i++) await page.locator('#compCards .card').nth(i).click({force:true});
               await page.locator('#compDone').click({force:true});
               await page.waitForTimeout(60);
-              if (await page.locator('#modal.show').count()) {
-                await page.locator('#modal.show .card').first().click({force:true});
-                await page.waitForTimeout(60);
-              }
+              if (await page.locator('#modal.show').count()) throw new Error('첫 구성에서 지도자 선택이 나타나면 안 됩니다. player=' + player);
             }
             if (!(await active('#battle'))) throw new Error('4인 PvP가 전투까지 진행되지 않습니다.');
             if (await page.locator('#arena .player').count() !== 4) throw new Error('4인 PvP 전투 플레이어 수가 잘못되었습니다.');
