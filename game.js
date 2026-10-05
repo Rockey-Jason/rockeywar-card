@@ -80,7 +80,7 @@ else if(n==="덩굴")chooseTarget(n,foe,x=>{x.c.status.dmgDown=.5;fxStatus(x.c,"
 else if(["네잎클로버","바위","나무","돌벽"].includes(n)){chooseOwn(n,[c],x=>{x.status.guard=n==="네잎클로버"?3:n==="바위"?5:n==="나무"?7:8;fxStatus(x,"guard","🧱 피해감소");finish()})}
 else if(n==="선인장"){c.status.reflect3=3;finish()}
 else if(n==="버섯"){c.status.deathBlast=true;finish()}
-else if(n==="거대한 나무"){own.forEach(x=>x.status.teamReduce=Math.max(x.status.teamReduce||0,2/100);fxStatus(x,"dmgDown","🛡 피해감소");});own.forEach(x=>x.status.teamReduceTurns=3);finish()}
+else if(n==="거대한 나무"){own.forEach(x=>{x.status.teamReduce=Math.max(x.status.teamReduce||0,2/100);fxStatus(x,"dmgDown","🛡 피해감소")});own.forEach(x=>x.status.teamReduceTurns=3);finish()}
 else if(n==="얼음벽"||n==="보석")chooseOwn(n,own,x=>{x.status.shield=true;fxStatus(x,"shield","🔰 보호막");finish()});
 else if(n==="얼음골렘")chooseTarget(n,foe,x=>{x.c.attackDown=3;x.c.attackDownTurns=2;finish()});
 else if(n==="눈사람"){foe.forEach(x=>{performAttack(c,x.c,1);x.c.status.dmgDown=.2;fxStatus(x.c,"dmgDown","🛡 피해감소");x.c.status.dmgDownTurns=1});finish()}
