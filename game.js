@@ -242,7 +242,7 @@ function skillCooldownHTML(c){
   return '<div class="skillCds"><div class="skillCd"><span>⚔ 스킬</span><b>'+(c.cd>0?c.cd+"턴":c.cdMax===0?"즉시":"사용 가능")+"</b></div></div>";
 }
 function cardHTML(c,click=false){let tags=[];if(c.status.stunned)tags.push("기절");if(c.status.burn)tags.push("화상");if(c.status.bleed)tags.push("출혈");if(c.status.poisoned)tags.push("독");if(c.status.radiation)tags.push("피폭");if(c.status.invuln)tags.push("🛡 무적");if(c.status.shield||c.status.snowShield)tags.push("🔰 보호막");if(c.status.guard)tags.push("🧱 피해감소");if(c.status.reflectOnce||c.status.reflect3)tags.push("↩ 반사");if(c.status.pierce)tags.push("⚡ 관통");if(c.status.nullifyNext)tags.push("❄ 다음 피해 무효");return '<div class="card '+(c.type==="leader"?"leader ":"")+(c.alive?"":"dead")+(click?" clickable":"")+'" data-card="'+c.id+'"><div class="head"><span>'+c.name+'</span><span class="stars">'+stars(c.star)+'</span></div><div class="attr">'+c.attr+(c.type==="leader"?" · LEADER":"")+'</div><div class="bar"><i style="width:'+clamp(c.hp/c.baseHp*100,0,100)+'%"></i></div><div class="hp">HP '+Math.max(0,c.hp)+' / '+c.baseHp+(c.cd>0?" · CD "+c.cd:"")+'</div><div class="desc">'+(c.type==="leader"?c.passive:c.desc)+'</div>'+skillCooldownHTML(c)+'<div class="tags">'+tags.map(x=>'<span class="tag bad">'+x+"</span>").join("")+'</div></div>'}
-function isAI(pi){return isAI(pi)}
+function isAI(pi){return S.mode==="pve"&&pi>0}
 function aiTargetScore(x){
   const c=x.c||x;
   if(!c||!c.alive)return -999999;
