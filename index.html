@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>돌이전쟁: 카드</title>
+<style>
+:root{--bg:#050812;--panel:rgba(13,20,37,.86);--panel2:#101a2e;--line:rgba(255,255,255,.1);--text:#edf4ff;--muted:#8ea0bc;--gold:#ffd76a;--blue:#6ab6ff;--red:#ff6b7a;--green:#61e5a1;--shadow:0 20px 70px rgba(0,0,0,.42)}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#17284d 0,#070b16 38%,#03050b 100%);color:var(--text);font-family:Inter,Pretendard,"Noto Sans KR",sans-serif;min-height:100vh;overflow-x:hidden}button{font:inherit;color:inherit}.app{max-width:1500px;margin:auto;padding:22px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}.brand{display:flex;align-items:center;gap:13px}.logo{width:48px;height:48px;border-radius:15px;background:linear-gradient(145deg,#ffe58a,#d99a2b);display:grid;place-items:center;color:#1c1505;font-size:25px;box-shadow:0 0 35px #d99a2b33}.brand h1{font-size:23px;margin:0}.brand small{display:block;color:var(--muted);margin-top:3px}.pill{border:1px solid var(--line);background:#ffffff08;border-radius:999px;padding:8px 13px;color:#b9c7dc;font-size:13px}.screen{display:none;animation:in .35s ease}.screen.active{display:block}@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}.hero{min-height:70vh;display:grid;place-items:center}.heroBox{width:min(850px,100%);padding:55px 35px;text-align:center;border:1px solid var(--line);border-radius:32px;background:linear-gradient(145deg,#101a30dd,#070c18dd);box-shadow:var(--shadow);backdrop-filter:blur(18px)}.heroTitle{font-size:clamp(42px,8vw,82px);letter-spacing:-4px;margin:0 0 10px;background:linear-gradient(100deg,#fff,#ffd76a,#8dc8ff);color:transparent;background-clip:text}.heroSub{color:var(--muted);font-size:17px}.buttons{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:30px}.btn{border:1px solid var(--line);background:#ffffff09;border-radius:13px;padding:12px 18px;cursor:pointer;transition:.2s}.btn:hover{transform:translateY(-2px);background:#ffffff12;border-color:#ffffff26}.btn.primary{background:linear-gradient(135deg,#ffd76a,#e9a52c);color:#161105;border:0;font-weight:800}.btn.danger{background:#ff536318;border-color:#ff536344}.setupGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:var(--shadow);backdrop-filter:blur(14px)}.panel h2,.panel h3{margin:0 0 14px}.choiceGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.choice{padding:15px;border:1px solid var(--line);border-radius:14px;background:#ffffff06;cursor:pointer}.choice.selected{border-color:var(--gold);background:#ffd76a12;box-shadow:0 0 25px #ffd76a0d}.choice b{display:block;margin-bottom:5px}.choice span{color:var(--muted);font-size:13px}.full{grid-column:1/-1}.setupActions{display:flex;justify-content:flex-end;gap:10px;margin-top:15px}.battleHead{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:15px;margin-bottom:15px}.turnBox{text-align:center}.turnBox strong{display:block;font-size:23px}.arena{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.playerBoard{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:15px;min-width:0}.playerBoard.active{border-color:#ffd76a88;box-shadow:0 0 35px #ffd76a0c}.playerTitle{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.coins{color:var(--gold)}.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.card{position:relative;min-height:150px;border-radius:15px;padding:11px;background:linear-gradient(155deg,#1a2842,#0d1425);border:1px solid #ffffff12;overflow:hidden;transition:.22s}.card:hover{transform:translateY(-3px)}.card.dead{opacity:.25;filter:grayscale(1)}.card.target{outline:2px solid var(--gold);box-shadow:0 0 25px #ffd76a33;cursor:pointer}.cardHead{display:flex;justify-content:space-between;font-weight:800}.stars{color:var(--gold);font-size:12px}.attr{font-size:11px;color:var(--blue);margin:6px 0}.hpbar{height:6px;background:#0008;border-radius:9px;overflow:hidden;margin:6px 0}.hpbar i{display:block;height:100%;background:linear-gradient(90deg,#ff6678,#ffd76a);transition:.4s}.hp{font-size:11px;color:#c4d0e3}.skill{font-size:11px;color:#a9b8cf;line-height:1.45;margin-top:8px}.leader{border:1px solid #ffd76a55;background:linear-gradient(155deg,#332a16,#171728)}.leaderTag{position:absolute;right:9px;bottom:8px;color:var(--gold);font-size:10px}.actionBar{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}.log{margin-top:14px;height:155px;overflow:auto;background:#02050b88;border:1px solid var(--line);border-radius:15px;padding:12px;font-size:12px;color:#9eb0cb}.log div{margin-bottom:7px}.shopGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.shopItem{padding:18px;border:1px solid var(--line);background:var(--panel);border-radius:18px}.shopItem .price{color:var(--gold);font-weight:800}.shopItem p{color:var(--muted);font-size:13px;min-height:38px}.shopItem button{width:100%}.modal{position:fixed;inset:0;background:#000b;display:none;place-items:center;padding:20px;z-index:50}.modal.show{display:grid}.modalBox{width:min(900px,100%);max-height:88vh;overflow:auto;background:#0b1220;border:1px solid var(--line);border-radius:24px;padding:22px;box-shadow:0 30px 100px #000}.selectCards{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.selectCards .card{min-height:130px;cursor:pointer}.selectCards .selected{border-color:var(--green);box-shadow:0 0 20px #61e5a122}.toast{position:fixed;left:50%;bottom:25px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#101a2b;border:1px solid var(--line);padding:12px 18px;border-radius:999px;z-index:80;transition:.25s}.toast.show{opacity:1;transform:translate(-50%,0)}.winner{font-size:30px;text-align:center;margin:20px}.winner b{color:var(--gold)}@media(max-width:850px){.setupGrid{grid-template-columns:1fr}.arena{grid-template-columns:1fr}.shopGrid{grid-template-columns:repeat(2,1fr)}.cards{grid-template-columns:repeat(2,1fr)}.selectCards{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.app{padding:12px}.shopGrid{grid-template-columns:1fr}.heroBox{padding:35px 18px}.heroTitle{letter-spacing:-2px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top"><div class="brand"><div class="logo">⚔</div><div><h1>돌이전쟁: 카드</h1><small>전략 · 전투 · 운빨</small></div></div><div class="pill" id="statusPill">READY</div></header>
+
+<section id="home" class="screen active"><div class="hero"><div class="heroBox"><div class="pill">ROCKEY WAR · CARD EDITION</div><h2 class="heroTitle">돌이전쟁: 카드</h2><p class="heroSub">카드 한 장의 선택이 전쟁의 흐름을 바꾼다.</p><div class="buttons"><button class="btn primary" onclick="openSetup()">게임 시작</button><button class="btn" onclick="showRules()">게임 규칙</button></div></div></div></section>
+
+<section id="setup" class="screen">
+<div class="setupGrid">
+<div class="panel"><h2>게임 설정</h2><div class="choiceGrid" id="modeChoices">
+<div class="choice selected" data-mode="pvp" onclick="chooseMode(this)"><b>⚔ PvP</b><span>2~4명이 직접 대결</span></div>
+<div class="choice" data-mode="pve" onclick="chooseMode(this)"><b>🤖 PvE</b><span>1인 플레이 + AI 상대</span></div></div><h3 style="margin-top:20px">플레이어 수</h3><div class="choiceGrid" id="countChoices">
+<div class="choice selected" data-count="2" onclick="chooseCount(this)"><b>2인</b><span>빠른 결투</span></div>
+<div class="choice" data-count="3" onclick="chooseCount(this)"><b>3인</b><span>삼파전</span></div>
+<div class="choice" data-count="4" onclick="chooseCount(this)"><b>4인</b><span>대규모 전쟁</span></div></div></div>
+<div class="panel"><h2>게임 시스템</h2><p class="heroSub">각 플레이어는 캐릭터 26장을 받고, 별이 가장 높은 카드로 선공 순서를 결정합니다.</p><p class="heroSub">전장에는 캐릭터 5장과 지도자 1장을 배치합니다. 전투에서 살아남아 승점을 획득하고, 코인으로 전력을 강화하세요.</p><div class="pill">목표 · 승점 5점</div></div>
+<div class="panel full"><h2>게임 시작 전 확인</h2><div id="setupPreview" class="heroSub">2인 PvP · 일반 카드 26장씩 배분 · 전장 5장 · 지도자 1장</div><div class="setupActions"><button class="btn" onclick="go('home')">취소</button><button class="btn primary" onclick="startGame()">전쟁 시작</button></div></div>
+</div>
+</section>
+
+<section id="battle" class="screen">
+<div class="battleHead"><div class="pill" id="phaseLabel">전투</div><div class="turnBox"><strong id="turnLabel">1 턴</strong><span class="heroSub" id="activeLabel"></span></div><div style="text-align:right"><span class="pill">승점 5점 = 승리</span></div></div>
+<div id="arena" class="arena"></div>
+<div class="log" id="log"></div>
+<div class="panel" style="margin-top:14px"><div class="actionBar" id="actions"></div></div>
+</section>
+
+<section id="shop" class="screen"><div class="panel"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><div><h2>🛒 구매 단계</h2><p class="heroSub" id="shopTurn"></p></div><div class="pill" id="shopCoins"></div></div><div class="shopGrid" id="shopGrid"></div><div class="actionBar"><button class="btn primary" onclick="finishShop()">구매 완료 · 다음 플레이어</button></div></div></section>
+
+<section id="end" class="screen"><div class="hero"><div class="heroBox"><div class="pill">GAME OVER</div><div class="winner" id="winner"></div><p class="heroSub">승점 5점에 먼저 도달한 플레이어가 전쟁의 승자입니다.</p><div class="buttons"><button class="btn primary" onclick="openSetup()">다시 플레이</button><button class="btn" onclick="go('home')">메인으로</button></div></div></div></section>
+</div>
+
+<div class="modal" id="rulesModal"><div class="modalBox"><h2>📖 게임 규칙</h2><p>① 캐릭터 더미에서 26장을 받고 가장 높은 별의 카드로 선공 순서를 결정합니다.</p><p>② 캐릭터 구성에서 덱 20장과 전장 5장, 지도자 1장을 선택합니다.</p><p>③ 전투는 정해진 순서대로 진행합니다. 각 플레이어는 카드 1장으로 1회 행동합니다.</p><p>④ 적 카드를 처치하면 그 카드의 별 수만큼 코인을 얻습니다.</p><p>⑤ 한 플레이어만 전장에 남으면 승점 1점과 코인 5개를 얻습니다.</p><p>⑥ 구매 단계에서 아이템·캐릭터·지도자를 구매합니다.</p><p>⑦ 승점 5점에 먼저 도달하면 즉시 승리합니다.</p><div class="actionBar"><button class="btn primary" onclick="closeRules()">닫기</button></div></div></div>
+<div class="modal" id="selectModal"><div class="modalBox"><h2 id="selectTitle">캐릭터 구성</h2><p class="heroSub" id="selectHelp"></p><div class="selectCards" id="selectCards"></div><div class="actionBar"><button class="btn primary" onclick="confirmSelection()">구성 완료</button></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const cards=[
+["눈사람","얼음",30,10,3,"모든 적에게 1 피해. 피해받은 적의 피해량 -20% (1턴).",3],
+["새싹","풀",40,5,1,"아군 1명의 체력 2 회복.",0],
+["덩굴","풀",20,7,2,"적 1명의 다음 공격 피해 -50%.",4],
+["네잎클로버","풀",15,6,2,"아군 1명의 다음 피해 -3.",3],
+["얼음골렘","얼음",15,15,4,"적 1명의 공격력 -3 (2턴).",5],
+["눈폭풍","얼음",10,8,3,"모든 적에게 2 피해.",4],
+["불씨","불",25,6,2,"적 1명에게 2 피해 + 화상 1 (2턴).",4],
+["화산석","불",10,12,4,"자신 3 HP를 소모해 적 1명에게 7 피해.",5],
+["바위","땅",30,15,2,"다음 받는 피해 -5.",3],
+["골렘","땅",10,25,5,"다음 공격 피해 2배. 이후 2턴 공격 불가.",7],
+["깃털","바람",25,5,1,"즉시 추가 행동 1회.",8],
+["회오리","바람",10,8,3,"적 1명의 현재 HP -2 후 덱으로 돌려보냄.",6],
+["민들레","풀",25,6,2,"아군 1명의 다음 공격 +5.",4],
+["나무","풀",15,20,4,"다음 받는 피해 -7.",4],
+["풀잎","풀",35,4,1,"자신 또는 아군 1명 HP 1 회복.",1],
+["꽃","풀",20,7,2,"모든 아군 HP 1 회복.",4],
+["선인장","풀",15,12,3,"자신에게 피해를 준 적에게 3 반사.",3],
+["버섯","풀",20,8,3,"처치될 때 모든 적에게 2 피해.",5],
+["거대한 나무","풀",5,30,5,"3턴 동안 모든 아군 받는 피해 -2.",10],
+["얼음벽","얼음",15,20,4,"아군 1명의 다음 피해 완전 무효.",7],
+["빙결정","얼음",15,7,3,"적 1명은 다음 차례 공격 불가.",4],
+["눈덩이","얼음",30,5,1,"적 1명에게 3 피해.",2],
+["펭귄","얼음",20,8,2,"적 1명의 다음 공격 -5.",3],
+["빙하","얼음",8,25,5,"모든 적의 다음 공격 -3.",7],
+["서리","얼음",20,6,2,"적 1명의 피해량 -20% (2턴).",5],
+["얼음결정","얼음",10,10,4,"적 1명 행동 불가 (1턴).",6],
+["불꽃","불",30,5,1,"적 1명에게 3 피해.",2],
+["횃불","불",20,8,2,"적 1명에게 2 피해 + 화상 (3턴).",4],
+["화염구","불",15,7,3,"적 1명에게 8 피해.",5],
+["용암","불",10,15,4,"적 1명에게 5 피해 + 화상 2 (2턴).",6],
+["불도마뱀","불",15,12,3,"HP가 절반 이하라면 공격 피해 +2.",3],
+["태양","불",5,25,5,"모든 아군의 다음 공격 +5.",9],
+["운석","불",5,10,5,"모든 적에게 5 피해.",10],
+["자갈","땅",40,5,1,"적 1명에게 2 피해.",1],
+["돌벽","땅",20,20,3,"다음 받는 피해 -8.",4],
+["석상","땅",10,20,4,"2턴 동안 받는 피해 50% 감소.",7],
+["바위산","땅",5,35,5,"받는 첫 피해 완전 무효.",8],
+["광부","땅",15,10,3,"아이템 1개 획득.",5],
+["보석","땅",10,8,4,"다음 받는 피해 0.",6],
+["땅곰","땅",15,18,3,"적 1명에게 6 피해.",4],
+["바람","바람",35,5,1,"적의 다음 공격 대상을 무작위 변경.",4],
+["돌풍","바람",20,7,2,"적 1명을 덱으로 돌려보냄.",6],
+["회오리바람","바람",15,8,3,"적 1명에게 4 피해 후 덱 맨 위로.",5],
+["독수리","바람",15,10,3,"다음 공격이 방어 효과 무시.",5],
+["매","바람",10,8,4,"적 1명에게 7 피해.",5],
+["태풍","바람",8,15,5,"모든 적을 덱으로 돌려보냄.",12],
+["바람새","바람",20,6,2,"아군 1명의 다음 공격을 한 번 더 사용 가능.",8]
+];
+const leaders=[
+["돌이","땅",60,10,"99% 확률 10% 반사, 1% 확률 100% 반사. 땅 아군 수×2만큼 모든 공격 추가 피해.","10 피해+기절 1턴","모든 적 1 피해+추가 공격",2,4],
+["식빵이","음식",100,10,"아군 피해의 50%를 대신 받고 자신 피해 25% 감소. 음식 덱이면 매턴 5 회복.","2턴 무적","",7,0],
+["윈터","얼음",30,10,"매턴 5 피해와 공격 -2. 모든 아군이 얼음이면 자해 없음, 공격 -1.","40 피해+기절 4턴","덱의 적에게 20 피해+기절 2턴",4,6],
+["모래","땅",40,10,"매턴 아이템 1개 획득. 가진 아이템 수만큼 피해 증가. 땅 덱이면 3턴마다 2회 공격.","모든 적 1 피해","적 1명을 일시 제거 (2회)",0,0],
+["복돌이","바람",45,10,"최저 HP 적에게 모든 피해 +5. 출혈은 +2.","15 피해+무한 출혈","다음 턴 피해 2배",4,7],
+["스노우","얼음",35,10,"HP 0에서 35 HP로 즉시 부활. 3턴마다 아군 보호막.","아군 5회 공격","아군 디버프 해제",20,5],
+["앙버터","불",80,10,"매턴 아군 HP +3. 음식 덱이면 아군 처치 시 다른 아군 3턴 무적+2 회복.","열기 전부로 영구 화상","3명 평균 HP의 1/5만큼 열기 축적",0,0],
+["대파","풀",45,10,"매턴 HP +5, 받는 피해 30% 감소.","20 피해+기절 2턴","아군 4턴간 매턴 3 회복",4,8]
+];
+const items=[
+["폭탄","적 1명 2 피해",20],["방패","아군 1명 1턴 무적",10],["알약","아군 1명 HP +1",30],["엑스레이","상대의 모든 카드를 확인",5],["돋보기","상대 카드 1장 확인",25],["그물망","적 1명 3턴 공격 불가",3],["마법의 물약","처치 카드 부활",3],["도로늄","모든 적에게 영구 피폭",1],["번개","적 1명 5 피해",8],["얼음 조각","적의 다음 공격 무효",5],["치료제","제거 가능한 디버프 제거",10],["반사경","다음 피해 1회 반사",4],["순간이동","원하는 카드와 다른 카드 교체",7],["강탈","상대 카드 2장 랜덤 획득",3],["독","모든 적 3턴 독 + 피해받을 때 +1",3]
+];
+
+let mode="pvp",count=2,players=[],order=[],turn=1,active=0,phase="battle",pendingSkill=null,selectionType="",selection=[];
+function go(id){document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active")}
+function chooseMode(el){document.querySelectorAll("#modeChoices .choice").forEach(x=>x.classList.remove("selected"));el.classList.add("selected");mode=el.dataset.mode;updatePreview()}
+function chooseCount(el){document.querySelectorAll("#countChoices .choice").forEach(x=>x.classList.remove("selected"));el.classList.add("selected");count=+el.dataset.count;updatePreview()}
+function updatePreview(){document.getElementById("setupPreview").textContent=count+"인 "+(mode==="pvp"?"PvP":"PvE")+" · 일반 카드 26장씩 배분 · 전장 5장 · 지도자 1장"}
+function openSetup(){go("setup");updatePreview()}
+function showRules(){document.getElementById("rulesModal").classList.add("show")}
+function closeRules(){document.getElementById("rulesModal").classList.remove("show")}
+function log(t){let e=document.getElementById("log");e.innerHTML="<div>› "+t+"</div>"+e.innerHTML}
+function toast(t){let e=document.getElementById("toast");e.textContent=t;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),1600)}
+function stars(n){return "★".repeat(n)}
+function makeCard(c,i){return {id:Date.now()+Math.random()+i,name:c[0],attr:c[1],max:c[3],hp:c[3],star:c[4],skill:c[5],cd:c[6],cool:0,alive:true,leader:false}}
+function makeLeader(l){return {id:Date.now()+Math.random(),name:l[0],attr:l[1],max:l[2],hp:l[2],star:l[3],skill:l[4],s1:l[5],s2:l[6],cd1:l[7],cd2:l[8],cool1:0,cool2:0,leader:true,alive:true}}
+function shuffled(a){return [...a].sort(()=>Math.random()-.5)}
+function startGame(){
+ players=[];let pool=shuffled(cards);let lp=shuffled(leaders);
+ for(let i=0;i<count;i++){let hand=[];for(let j=0;j<26;j++)hand.push(makeCard(pool[Math.floor(Math.random()*pool.length)],j));let top=hand.reduce((a,b)=>b.star>a.star?b:a,hand[0]);players.push({id:i,name:mode==="pve"&&i===count-1?"AI":"플레이어 "+(i+1),hand,deck:hand.slice(0,20),field:[],leader:null,coins:0,score:0,items:[],initiative:top.star,dead:false})}
+ order=players.map((p,i)=>({i,s:p.initiative})).sort((a,b)=>b.s-a.s).map(x=>x.i);
+ players.forEach((p,i)=>{p.order=order.indexOf(i);});
+ log("선공 순서: "+order.map(i=>players[i].name).join(" → "));
+ beginComposition();
+}
+function beginComposition(){phase="composition";active=0;selection=[];openCompositionFor(0)}
+function openCompositionFor(pi){
+ active=pi;selection=[];selectionType="field";document.getElementById("selectTitle").textContent=players[pi].name+" · 캐릭터 구성";
+ document.getElementById("selectHelp").textContent="전장에 보낼 캐릭터 5장을 선택하세요. 나머지는 덱으로 사용됩니다.";
+ renderSelection();document.getElementById("selectModal").classList.add("show");
+}
+function renderSelection(){
+ let p=players[active];let el=document.getElementById("selectCards");el.innerHTML=p.hand.map((c,i)=>'<div class="card '+(selection.includes(i)?"selected":"")+'" onclick="toggleSelection('+i+')"><div class="cardHead"><span>'+c.name+'</span><span class="stars">'+stars(c.star)+'</span></div><div class="attr">'+c.attr+'</div><div class="hp">HP '+c.hp+'</div><div class="skill">'+c.skill+'</div></div>').join("");
+}
+function toggleSelection(i){if(selection.includes(i))selection=selection.filter(x=>x!==i);else if(selection.length<5)selection.push(i);renderSelection()}
+function confirmSelection(){
+ if(selection.length!==5){toast("전장에 보낼 카드 5장을 선택하세요.");return}
+ let p=players[active];p.field=selection.map(i=>p.hand[i]);p.deck=p.hand.filter((_,i)=>!selection.includes(i)).slice(0,20);
+ let l=leaders[Math.floor(Math.random()*leaders.length)];p.leader=makeLeader(l);
+ document.getElementById("selectModal").classList.remove("show");
+ if(active+1<count){setTimeout(()=>openCompositionFor(active+1),250)}else{phase="battle";active=order[0];turn=1;renderBattle();log("모든 플레이어의 구성이 완료되었습니다. 전투 시작!")}
+}
+function allCombatants(p){return [...p.field,p.leader].filter(Boolean)}
+function aliveCards(p){return allCombatants(p).filter(c=>c.alive&&c.hp>0)}
+function renderBattle(){
+ go("battle");document.getElementById("statusPill").textContent="TURN "+turn;document.getElementById("turnLabel").textContent=turn+" 턴";document.getElementById("activeLabel").textContent=players[active].name+"의 행동";
+ document.getElementById("phaseLabel").textContent="⚔ 전투";
+ document.getElementById("arena").innerHTML=players.map((p,pi)=>'<div class="playerBoard '+(pi===active?"active":"")+'"><div class="playerTitle"><b>'+p.name+(pi===active?" · 행동 중":"")+'</b><span><span class="coins">◆ '+p.coins+'</span> · 승점 '+p.score+'</span></div><div class="cards">'+allCombatants(p).map((c,ci)=>cardHTML(c,pi,ci)).join("")+'</div><div class="actionBar">'+(pi===active?'<span class="pill">카드를 클릭해 행동</span>':'<span class="pill">대기</span>')+'</div></div>').join("");
+ document.getElementById("actions").innerHTML=activeControls();
+}
+function cardHTML(c,pi,ci){let cls="card "+(c.leader?"leader ":"")+(c.alive?"":"dead");return '<div class="'+cls+'" '+(pi===active&&c.alive?'onclick="useCard('+pi+','+ci+')"':'')+'><div class="cardHead"><span>'+c.name+'</span><span class="stars">'+stars(c.star)+'</span></div><div class="attr">'+c.attr+(c.leader?" · LEADER":"")+'</div><div class="hpbar"><i style="width:'+Math.max(0,c.hp/c.max*100)+'%"></i></div><div class="hp">HP '+Math.max(0,c.hp)+' / '+c.max+'</div><div class="skill">'+(c.leader?c.skill:c.skill)+'</div>'+(c.leader?'<div class="leaderTag">LEADER</div>':(c.cool>0?'<div class="leaderTag">CD '+c.cool+'</div>':''))+'</div>'}
+function activeControls(){let p=players[active];return '<button class="btn" onclick="endAction()">행동 종료</button><button class="btn" onclick="openRules()">규칙</button><span class="pill">아이템 '+p.items.length+'개 · 코인 '+p.coins+'</span>'}
+function openRules(){showRules()}
+function useCard(pi,ci){
+ let p=players[pi],c=allCombatants(p)[ci];if(!c||!c.alive)return;
+ pendingSkill={pi,ci};document.getElementById("actions").innerHTML='<span class="pill">'+c.name+'의 스킬을 선택했습니다. 대상 카드를 클릭하거나 실행하세요.</span><button class="btn primary" onclick="executeSkill()">스킬 사용</button><button class="btn" onclick="cancelSkill()">취소</button>';
+ document.querySelectorAll(".playerBoard .card").forEach((el)=>el.classList.add("target"));
+ toast(c.name+" 선택");
+}
+function cancelSkill(){pendingSkill=null;renderBattle()}
+function executeSkill(){
+ if(!pendingSkill)return;let p=players[pendingSkill.pi],c=allCombatants(p)[pendingSkill.ci];if(!c.alive){cancelSkill();return}
+ let targets=players.filter((_,i)=>i!==active).flatMap(q=>aliveCards(q));
+ if(!targets.length){endAction();return}
+ let target=targets[Math.floor(Math.random()*targets.length)];
+ if(c.leader)leaderSkill(p,c,target);else normalSkill(p,c,target);
+ pendingSkill=null;checkBattleEnd();if(phase==="battle")endAction();
+}
+function normalSkill(p,c,target){
+ if(c.cool>0){toast("쿨타임이 "+c.cool+"턴 남았습니다.");return}
+ let n=c.name;
+ if(n==="새싹"||n==="풀잎"){let a=aliveCards(p).sort(()=>Math.random()-.5)[0];a.hp=Math.min(a.max,a.hp+(n==="새싹"?2:1));log(p.name+"의 "+n+" → "+a.name+" 회복")}
+ else if(n==="꽃"){aliveCards(p).forEach(a=>a.hp=Math.min(a.max,a.hp+1));log(p.name+"의 꽃 → 아군 전체 회복")}
+ else if(n==="민들레"){let a=aliveCards(p)[0];a.buff=(a.buff||0)+5;log(p.name+"의 민들레 → "+a.name+" 공격 +5")}
+ else if(n==="네잎클로버"||n==="바위"||n==="나무"||n==="돌벽"){c.guard=n==="나무"?7:n==="돌벽"?8:n==="바위"?5:3;log(p.name+"의 "+n+" → 방어 효과")}
+ else if(n==="광부"){p.items.push(items[Math.floor(Math.random()*items.length)]);log(p.name+"의 광부 → 아이템 획득")}
+ else if(n==="골렘"){c.doubleNext=true;c.skip=2;log(p.name+"의 골렘 → 다음 공격 2배")}
+ else if(n==="깃털"){log(p.name+"의 깃털 → 추가 행동");c.extra=true}
+ else if(n==="회오리"||n==="돌풍"||n==="태풍"){target.hp=Math.max(0,target.hp-(n==="회오리"?2:0));if(n!=="회오리")target.alive=false;log(p.name+"의 "+n+" → "+target.name+"을 덱으로 이동")}
+ else if(n==="눈사람"){targetsAllEnemy(a=>{damage(a,1);a.weaken=20});log(p.name+"의 눈사람 → 적 전체 공격 약화")}
+ else if(n==="눈폭풍"){targetsAllEnemy(a=>damage(a,2));}
+ else if(n==="얼음골렘"){target.attackDown=3;target.downTurns=2;log(target.name+" 공격력 -3")}
+ else if(n==="빙결정"||n==="얼음결정"){target.skip=1;log(target.name+" 행동 불가")}
+ else if(n==="눈덩이"||n==="불꽃"||n==="자갈"||n==="땅곰"||n==="매"||n==="화염구"){damage(target,n==="눈덩이"?3:n==="불꽃"?3:n==="자갈"?2:n==="땅곰"?6:n==="매"?7:8)}
+ else if(n==="불씨"||n==="횃불"||n==="용암"){damage(target,n==="불씨"?2:n==="횃불"?2:5);target.burn=(target.burn||0)+(n==="용암"?2:1);target.burnTurns=n==="횃불"?3:2}
+ else if(n==="운석"){targetsAllEnemy(a=>damage(a,5))}
+ else if(n==="태양"){aliveCards(p).forEach(a=>a.buff=(a.buff||0)+5)}
+ else if(n==="불도마뱀"){c.selfBonus=c.hp<=c.max/2?2:0}
+ else if(n==="선인장"){c.reflect=3}
+ else if(n==="버섯"){c.onDeath=true}
+ else if(n==="거대한 나무"){aliveCards(p).forEach(a=>a.teamGuard=2)}
+ else if(n==="얼음벽"||n==="보석"){let a=aliveCards(p)[0];a.guard=999;log(a.name+"의 다음 피해 무효")}
+ else if(n==="빙하"){targetsAllEnemy(a=>a.attackDown=(a.attackDown||0)+3)}
+ else if(n==="서리"){target.weaken=20;target.downTurns=2}
+ else if(n==="독수리"){c.pierce=true}
+ else if(n==="회오리바람"){damage(target,4);target.alive=false}
+ else if(n==="바람"){target.randomTarget=true}
+ else if(n==="바람새"){let a=aliveCards(p)[0];a.extra=true}
+ else {damage(target,2)}
+ c.cool=c.cd||0;
+}
+function targetsAllEnemy(fn){players.forEach((p,i)=>{if(i!==active)aliveCards(p).forEach(fn)})}
+function damage(c,amount){if(!c.alive)return;let v=amount;if(c.guard){v=Math.max(0,v-c.guard);c.guard=0}if(c.teamGuard)v=Math.max(0,v-c.teamGuard);if(c.weaken)v=Math.floor(v*(1-c.weaken/100));c.hp-=Math.max(0,v);if(c.hp<=0){c.hp=0;c.alive=false;log(c.name+" 처치!");let owner=players.find(p=>allCombatants(p).includes(c));if(owner){let killer=players[active];killer.coins+=c.star}}}
+function leaderSkill(p,c,target){
+ if(c.cool1>0&&c.cool2>0){toast("사용 가능한 지도자 스킬이 없습니다.");return}
+ if(c.name==="돌이"){damage(target,10);target.skip=1;c.cool1=c.cd1}
+ else if(c.name==="식빵이"){c.guard=999;c.cool1=c.cd1}
+ else if(c.name==="윈터"){damage(target,40);target.skip=4;c.cool1=c.cd1}
+ else if(c.name==="모래"){targetsAllEnemy(a=>damage(a,1));c.cool1=4}
+ else if(c.name==="복돌이"){damage(target,15);target.bleed=true;c.cool1=4}
+ else if(c.name==="스노우"){aliveCards(p).forEach(a=>a.extra=true);c.cool1=20}
+ else if(c.name==="앙버터"){c.heat=(c.heat||0)+10;target.burn=1;target.burnPermanent=true;c.cool1=4}
+ else if(c.name==="대파"){damage(target,20);target.skip=2;c.cool1=4}
+}
+function endAction(){
+ if(phase!=="battle")return;
+ let p=players[active];allCombatants(p).forEach(c=>{if(c.cool>0)c.cool--;if(c.cool1>0)c.cool1--;if(c.cool2>0)c.cool2--;if(c.downTurns>0)c.downTurns--;if(c.burn&&c.burnTurns>0){damage(c,c.burn);c.burnTurns--}});
+ if(checkBattleEnd())return;
+ let idx=order.indexOf(active);let next=order[(idx+1)%order.length];if(next===order[0])turn++;
+ active=next;renderBattle();
+ if(mode==="pve"&&active===count-1)setTimeout(aiTurn,650);
+}
+function aiTurn(){if(phase!=="battle")return;let p=players[active],alive=aliveCards(p);if(!alive.length){endAction();return}let c=alive.sort((a,b)=>a.hp-b.hp)[0];let idx=allCombatants(p).indexOf(c);useCard(active,idx);setTimeout(()=>executeSkill(),350)}
+function checkBattleEnd(){
+ let alivePlayers=players.filter(p=>aliveCards(p).length>0);
+ if(alivePlayers.length<=1){let winner=alivePlayers[0];if(winner){winner.score++;winner.coins+=5;log(winner.name+"이 전투 승리! 승점 +1, 코인 +5");if(winner.score>=5){showWinner(winner);return true}}
+ phase="shop";active=order[0];renderShop();return true}
+ return false
+}
+function renderShop(){
+ go("shop");let p=players[active];document.getElementById("shopTurn").textContent=p.name+"의 구매 차례";document.getElementById("shopCoins").textContent="◆ "+p.coins+" 코인";
+ let data=[["아이템",1,"아이템 더미에서 1개 획득 · 한 번에 최대 3개",()=>buyItem(p)],["물약",5,"원하는 아군 1명의 HP를 기본 체력으로 회복",()=>buyPotion(p)],["캐릭터",3,"캐릭터 더미에서 1장 획득",()=>buyCharacter(p)],["랜덤 지도자",7,"지도자 더미 맨 위 카드 1장 획득",()=>buyLeader(p,true)],["지도자",12,"원하는 지도자를 선택해 획득",()=>buyLeader(p,false)]];
+ document.getElementById("shopGrid").innerHTML=data.map(x=>'<div class="shopItem"><h3>'+x[0]+'</h3><div class="price">'+x[1]+' 코인</div><p>'+x[2]+'</p><button class="btn primary" onclick="('+x[3].toString()+')()">구매</button></div>').join("");
+}
+function spend(p,n){if(p.coins<n){toast("코인이 부족합니다.");return false}p.coins-=n;return true}
+function buyItem(p){if(p.items.length>=3){toast("이번 구매 단계에서는 아이템을 최대 3개까지 구매할 수 있습니다.");return}if(spend(p,1)){p.items.push(items[Math.floor(Math.random()*items.length)]);toast("아이템 획득!")}}
+function buyPotion(p){if(spend(p,5)){let a=aliveCards(p)[0];if(a){a.hp=a.max;toast(a.name+"의 HP가 완전히 회복되었습니다.")}}}
+function buyCharacter(p){if(spend(p,3)){p.deck.push(makeCard(cards[Math.floor(Math.random()*cards.length)],0));toast("새 캐릭터를 획득했습니다.")}}
+function buyLeader(p,random){if(!spend(p,12-(random?5:0)))return;let l=leaders[Math.floor(Math.random()*leaders.length)];p.leader=makeLeader(l);toast(l[0]+" 지도자를 획득했습니다.")}
+function finishShop(){
+ let idx=order.indexOf(active);active=order[(idx+1)%order.length];if(active===order[0]){turn++;resetBattle();phase="battle";renderBattle()}else renderShop()
+}
+function resetBattle(){
+ players.forEach(p=>{p.field=p.deck.slice(0,5);p.field.forEach(c=>{c.alive=true;c.hp=c.max});if(!p.leader)p.leader=makeLeader(leaders[Math.floor(Math.random()*leaders.length)]);p.leader.alive=true;p.leader.hp=p.leader.max})
+}
+function showWinner(p){phase="end";document.getElementById("winner").innerHTML="🏆 <b>"+p.name+"</b> 승리!";go("end")}
+</script>
+</body>
+</html>
