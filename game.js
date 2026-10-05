@@ -165,6 +165,11 @@ function cardHTML(c,click=false){let tags=[];if(c.status.stunned)tags.push("기�
 function render(){if(S.phase==="composition")renderComposition();else if(S.phase==="battle")renderBattle();else if(S.phase==="shop")renderShop()}
 function renderComposition(){
   go("composition");
+  const current=S.players[S.compositionIndex];
+  if(current&&isAI(S.compositionIndex)&&!current.dealing&&current.initialDealAnimated){
+    aiFinishComposition(S.compositionIndex);
+    return;
+  }
   const p=S.players[S.compositionIndex];
   $("compInfo").textContent=p.dealing?p.name+" · 카드 지급 중…":p.name+" · 비공개 구성 · 5장 전장 선택";
   $("compProgress").textContent=(S.compositionIndex+1)+"/"+S.players.length+" 플레이어";
