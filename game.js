@@ -66,34 +66,34 @@ const finish=()=>{c.cd=c.cdMax||0;finishAction(c,pi)};
 if(n==="새싹")chooseOwn("새싹",own,x=>{let before=x.hp;x.hp=Math.min(x.baseHp,x.hp+2);fxHeal(x,x.hp-before);log(x.name+" HP +2");finish()});
 else if(n==="풀잎")chooseOwn("풀잎",own,x=>{let before=x.hp;x.hp=Math.min(x.baseHp,x.hp+1);fxHeal(x,x.hp-before);finish()});
 else if(n==="꽃"){own.forEach(x=>{let before=x.hp;x.hp=Math.min(x.baseHp,x.hp+1);fxHeal(x,x.hp-before)});finish()}
-else if(n==="민들레")chooseOwn("민들레",own,x=>{x.status.attackBonus=(x.status.attackBonus||0)+5;finish()});
-else if(n==="덩굴")chooseTarget(n,foe,x=>{x.c.status.dmgDown=.5;x.c.status.dmgDownTurns=1;finish()});
-else if(["네잎클로버","바위","나무","돌벽"].includes(n)){chooseOwn(n,[c],x=>{x.status.guard=n==="네잎클로버"?3:n==="바위"?5:n==="나무"?7:8;finish()})}
+else if(n==="민들레")chooseOwn("민들레",own,x=>{x.status.attackBonus=(x.status.attackBonus||0)+5;fxStatus(x,"attackUp","⚔ 공격력 +5");finish()});
+else if(n==="덩굴")chooseTarget(n,foe,x=>{x.c.status.dmgDown=.5;fxStatus(x.c,"dmgDown","🛡 피해감소");x.c.status.dmgDownTurns=1;finish()});
+else if(["네잎클로버","바위","나무","돌벽"].includes(n)){chooseOwn(n,[c],x=>{x.status.guard=n==="네잎클로버"?3:n==="바위"?5:n==="나무"?7:8;fxStatus(x,"guard","🧱 피해감소");finish()})}
 else if(n==="선인장"){c.status.reflect3=3;finish()}
 else if(n==="버섯"){c.status.deathBlast=true;finish()}
-else if(n==="거대한 나무"){own.forEach(x=>x.status.teamReduce=Math.max(x.status.teamReduce||0,2/100));own.forEach(x=>x.status.teamReduceTurns=3);finish()}
-else if(n==="얼음벽"||n==="보석")chooseOwn(n,own,x=>{x.status.shield=true;finish()});
+else if(n==="거대한 나무"){own.forEach(x=>x.status.teamReduce=Math.max(x.status.teamReduce||0,2/100);fxStatus(x,"dmgDown","🛡 피해감소");});own.forEach(x=>x.status.teamReduceTurns=3);finish()}
+else if(n==="얼음벽"||n==="보석")chooseOwn(n,own,x=>{x.status.shield=true;fxStatus(x,"shield","🔰 보호막");finish()});
 else if(n==="얼음골렘")chooseTarget(n,foe,x=>{x.c.attackDown=3;x.c.attackDownTurns=2;finish()});
-else if(n==="눈사람"){foe.forEach(x=>{performAttack(c,x.c,1);x.c.status.dmgDown=.2;x.c.status.dmgDownTurns=1});finish()}
+else if(n==="눈사람"){foe.forEach(x=>{performAttack(c,x.c,1);x.c.status.dmgDown=.2;fxStatus(x.c,"dmgDown","🛡 피해감소");x.c.status.dmgDownTurns=1});finish()}
 else if(n==="눈폭풍"){foe.forEach(x=>performAttack(c,x.c,2));finish()}
-else if(n==="빙결정")chooseTarget(n,foe,x=>{x.c.status.stunned=true;x.c.status.stunTurns=1;finish()});
-else if(n==="얼음결정")chooseTarget(n,foe,x=>{x.c.status.stunned=true;x.c.status.stunTurns=1;finish()});
+else if(n==="빙결정")chooseTarget(n,foe,x=>{x.c.status.stunned=true;fxStatus(x.c,"stunned","💫 기절");x.c.status.stunTurns=1;finish()});
+else if(n==="얼음결정")chooseTarget(n,foe,x=>{x.c.status.stunned=true;fxStatus(x.c,"stunned","💫 기절");x.c.status.stunTurns=1;finish()});
 else if(n==="눈덩이")hit(3);
-else if(n==="펭귄")chooseTarget(n,foe,x=>{x.c.status.attackDown=5;x.c.status.attackDownTurns=1;finish()});
-else if(n==="빙하"){foe.forEach(x=>{x.c.status.attackDown=3;x.c.status.attackDownTurns=1});finish()}
-else if(n==="서리")chooseTarget(n,foe,x=>{x.c.status.dmgDown=.2;x.c.status.dmgDownTurns=2;finish()});
+else if(n==="펭귄")chooseTarget(n,foe,x=>{x.c.status.attackDown=5;fxStatus(x.c,"attackDown","↘ 공격력 감소");x.c.status.attackDownTurns=1;finish()});
+else if(n==="빙하"){foe.forEach(x=>{x.c.status.attackDown=3;fxStatus(x.c,"attackDown","↘ 공격력 감소");x.c.status.attackDownTurns=1});finish()}
+else if(n==="서리")chooseTarget(n,foe,x=>{x.c.status.dmgDown=.2;fxStatus(x.c,"dmgDown","🛡 피해감소");x.c.status.dmgDownTurns=2;finish()});
 else if(n==="不")finish();
-else if(n==="불씨"||n==="횃불"||n==="용암")chooseTarget(n,foe,x=>{let base=n==="불씨"?2:n==="횃불"?2:5;performAttack(c,x.c,base);x.c.status.burn=(n==="용암"?2:1);x.c.status.burnTurns=n==="횃불"?3:2;finish()});
+else if(n==="불씨"||n==="횃불"||n==="용암")chooseTarget(n,foe,x=>{let base=n==="불씨"?2:n==="횃불"?2:5;performAttack(c,x.c,base);x.c.status.burn=(n==="용암"?2:1);fxStatus(x.c,"burn","🔥 화상");x.c.status.burnTurns=n==="횃불"?3:2;finish()});
 else if(n==="화산석")chooseTarget(n,foe,x=>{if(c.hp<=3){toast("HP가 부족합니다.");return}c.hp-=3;performAttack(c,x.c,7);finish()});
 else if(n==="불꽃")hit(3);
 else if(n==="화염구")hit(8);
 else if(n==="불도마뱀")hit(3);
-else if(n==="태양"){own.forEach(x=>x.status.attackBonus=(x.status.attackBonus||0)+5);finish()}
+else if(n==="태양"){own.forEach(x=>{x.status.attackBonus=(x.status.attackBonus||0)+5;fxStatus(x,"attackUp","⚔ 공격력 +5")});finish()}
 else if(n==="운석"){foe.forEach(x=>performAttack(c,x.c,5));finish()}
 else if(n==="골렘"){c.status.doubleNext=true;c.status.stunned=true;c.status.stunTurns=2;finish()}
 else if(n==="자갈")hit(2);
-else if(n==="석상"){c.status.halfTurns=2;finish()}
-else if(n==="바위산"){c.status.firstImmune=true;finish()}
+else if(n==="석상"){c.status.halfTurns=2;fxStatus(c,"guard","🛡 피해 50% 감소");finish()}
+else if(n==="바위산"){c.status.firstImmune=true;fxStatus(c,"invuln","🛡 첫 피해 무효");finish()}
 else if(n==="광부"){p.items.push(drawItem());finish()}
 else if(n==="땅곰")hit(6);
 else if(n==="깃털"){c.status.extraAction=true;c.cd=c.cdMax;finishAction(c,pi)}
@@ -113,11 +113,11 @@ const options=(defs[c.name]||[]).filter(x=>x[2]);if(!options.length){toast("사�
 if(options.length>1&&!(S.mode==="pve"&&pi===S.count-1)){showModal(c.name+" · 스킬 선택",options.map((x,i)=>'<button class="itemBtn" data-s="'+i+'"><b>'+x[0]+"</b><br>"+x[1]+"</button>").join(""));$("modalBody").querySelectorAll("button").forEach(btn=>btn.onclick=()=>{let skill=options[+btn.dataset.s];closeModal();leaderAction(c,pi,skill[0])});return}
 leaderAction(c,pi,options[0][0])}
 function leaderAction(c,pi,skill){let p=S.players[pi],foes=enemies(pi),own=alive(p);
-if(c.name==="돌이"&&skill==="스킬 1")chooseTarget("돌이 스킬 1",foes,x=>{performAttack(c,x.c,10);x.c.status.stunned=true;x.c.status.stunTurns=1;c.cd1=c.cd1Max;finishAction(c,pi)});
+if(c.name==="돌이"&&skill==="스킬 1")chooseTarget("돌이 스킬 1",foes,x=>{performAttack(c,x.c,10);x.c.status.stunned=true;fxStatus(x.c,"stunned","💫 기절");x.c.status.stunTurns=1;c.cd1=c.cd1Max;finishAction(c,pi)});
 else if(c.name==="돌이"&&skill==="스킬 2"){foes.forEach(x=>performAttack(c,x.c,1));c.cd2=c.cd2Max;p.status.extraTeamAttack=true;finishAction(c,pi)}
 else if(c.name==="식빵이"){c.status.invuln=true;c.status.invulnTurns=2;c.cd1=c.cd1Max;finishAction(c,pi)}
-else if(c.name==="윈터"&&skill==="스킬 1")chooseTarget("윈터 스킬 1",foes,x=>{performAttack(c,x.c,40);x.c.status.stunned=true;x.c.status.stunTurns=4;c.cd1=c.cd1Max;finishAction(c,pi)});
-else if(c.name==="윈터"&&skill==="스킬 2"){let pool=S.players.filter((_,i)=>i!==pi).flatMap(q=>q.deck.filter(x=>x.alive).map(x=>({p:q,c:x})));if(!pool.length){toast("상대 덱에 카드가 없습니다.");return}chooseTarget("윈터 스킬 2",pool,x=>{performAttack(c,x.c,20);x.c.status.stunned=true;x.c.status.stunTurns=2;c.cd2=c.cd2Max;finishAction(c,pi)})}
+else if(c.name==="윈터"&&skill==="스킬 1")chooseTarget("윈터 스킬 1",foes,x=>{performAttack(c,x.c,40);x.c.status.stunned=true;fxStatus(x.c,"stunned","💫 기절");x.c.status.stunTurns=4;c.cd1=c.cd1Max;finishAction(c,pi)});
+else if(c.name==="윈터"&&skill==="스킬 2"){let pool=S.players.filter((_,i)=>i!==pi).flatMap(q=>q.deck.filter(x=>x.alive).map(x=>({p:q,c:x})));if(!pool.length){toast("상대 덱에 카드가 없습니다.");return}chooseTarget("윈터 스킬 2",pool,x=>{performAttack(c,x.c,20);x.c.status.stunned=true;fxStatus(x.c,"stunned","💫 기절");x.c.status.stunTurns=2;c.cd2=c.cd2Max;finishAction(c,pi)})}
 else if(c.name==="모래"&&skill==="스킬 1"){foes.forEach(x=>performAttack(c,x.c,1));c.cd1=3;finishAction(c,pi)}
 else if(c.name==="모래"&&skill==="스킬 2")chooseTarget("모래 제거",foes,x=>{x.c.alive=true;x.c.hp=x.c.baseHp;x.c.status={};x.p.field=x.p.field.filter(card=>card!==x.c);x.p.removedUntilEmpty=(x.p.removedUntilEmpty||[]).concat(x.c);c.uses--;finishAction(c,pi)});
 else if(c.name==="복돌이"&&skill==="스킬 1")chooseTarget("복돌이 출혈",foes,x=>{performAttack(c,x.c,15);x.c.status.bleed=3;x.c.status.bleedPermanent=true;c.cd1=c.cd1Max;finishAction(c,pi)});
@@ -127,7 +127,7 @@ else if(c.name==="스노우"&&skill==="스킬 1"){p.status.multiAttack=5;p.statu
 else if(c.name==="스노우"&&skill==="스킬 2"){own.forEach(clearRemovable);c.cd2=c.cd2Max;finishAction(c,pi)}
 else if(c.name==="앙버터"&&skill==="스킬 1")chooseTarget("앙버터 영구 화상",foes,x=>{x.c.status.permaBurn=c.heat;x.c.status.permaBurnStep=c.heat;x.c.status.burnPermanent=true;c.heat=0;finishAction(c,pi)});
 else if(c.name==="앙버터"&&skill==="스킬 2"){let pool=foes.map(x=>x.c);if(isAI(pi)){let picked=pool.slice().sort((a,b)=>b.hp-a.hp).slice(0,3);c.heat=Math.floor(picked.reduce((sum,x)=>sum+x.hp,0)/3/5);finishAction(c,pi)}else{showModal("앙버터 · 열기 대상 3장 선택",pool.map((x,i)=>'<button class="itemBtn" data-i="'+i+'">'+x.name+" · HP "+x.hp+"</button>").join(""));let picked=[];$("modalBody").querySelectorAll("button").forEach(btn=>btn.onclick=()=>{let i=+btn.dataset.i;if(picked.includes(i))return;picked.push(i);btn.disabled=true;if(picked.length===3){c.heat=Math.floor(picked.reduce((sum,k)=>sum+pool[k].hp,0)/3/5);closeModal();finishAction(c,pi)}})}}else if(c.name==="앙버터"&&skill==="스킬 3"){let heat=c.heat;c.heat=0;foes.forEach(x=>performAttack(c,x.c,heat*2));finishAction(c,pi)}
-else if(c.name==="대파"&&skill==="스킬 1")chooseTarget("대파 스킬 1",foes,x=>{performAttack(c,x.c,20);x.c.status.stunned=true;x.c.status.stunTurns=2;c.cd1=c.cd1Max;finishAction(c,pi)});
+else if(c.name==="대파"&&skill==="스킬 1")chooseTarget("대파 스킬 1",foes,x=>{performAttack(c,x.c,20);x.c.status.stunned=true;fxStatus(x.c,"stunned","💫 기절");x.c.status.stunTurns=2;c.cd1=c.cd1Max;finishAction(c,pi)});
 else if(c.name==="대파"&&skill==="스킬 2"){own.forEach(x=>x.status.healTurns=4);c.cd2=c.cd2Max;finishAction(c,pi)}
 else if(c.name==="대파"&&skill==="스킬 3"){if(c.qi>=20){foes.forEach(x=>{x.c.hp=x.c.hp<=5?0:1;if(x.c.hp===0)defeat(x.c,c)});c.status.qiFinished=true;finishAction(c,pi)}else{c.qi++;own.forEach(x=>x.status.teamReduce=Math.min(1,.4+c.qi*.05));log("대파 기 충전 "+c.qi+"/20");finishAction(c,pi)}}}
 function clearRemovable(c){for(const k of ["stunned","stunTurns","burn","burnTurns","bleed","poisoned","poisonTurns","attackDown","attackDownTurns","dmgDown","dmgDownTurns","randomTarget","randomTargetTurns","guard"])delete c.status[k]}
@@ -135,11 +135,11 @@ function drawItem(){return S.itemDeck.pop()||{id:id(),name:I[Math.floor(Math.ran
 function useItem(p,item){let idx=p.items.indexOf(item);if(idx<0)return;const name=item.name;const foes=enemies(p.id),own=alive(p);
 const done=()=>{p.items.splice(idx,1);if(!checkEnd())render();};
 if(name==="폭탄")chooseTarget("폭탄",foes,x=>{receiveDamage(x.c,2,null);done()});
-else if(name==="방패")chooseOwn("방패",own,x=>{x.status.invuln=true;x.status.invulnTurns=1;done()});
+else if(name==="방패")chooseOwn("방패",own,x=>{x.status.invuln=true;fxStatus(x,"invuln","🛡 무적");x.status.invulnTurns=1;done()});
 else if(name==="알약")chooseOwn("알약",own,x=>{x.hp=Math.min(x.baseHp,x.hp+1);done()});
 else if(name==="엑스레이"){let q=S.players.find(x=>x!==p);showModal("엑스레이",q?cardList(q):"없음");done()}
 else if(name==="돋보기"){let q=S.players.find(x=>x!==p);let pool=q?[...q.field,...q.deck,...q.reserve].filter(x=>x.alive):[];if(!pool.length){toast("확인할 카드가 없습니다.");return}showModal("돋보기 · 확인할 카드 선택",pool.map((c,i)=>'<button class="itemBtn" data-i="'+i+'">'+c.name+" · "+c.attr+" · "+stars(c.star)+"</button>").join(""));$("modalBody").querySelectorAll("button").forEach(b=>b.onclick=()=>{let c=pool[+b.dataset.i];showModal("돋보기 결과",cardHTML(c));done()})}
-else if(name==="그물망")chooseTarget("그물망",foes,x=>{x.c.status.stunned=true;x.c.status.stunTurns=3;done()});
+else if(name==="그물망")chooseTarget("그물망",foes,x=>{x.c.status.stunned=true;fxStatus(x.c,"stunned","💫 기절");x.c.status.stunTurns=3;done()});
 else if(name==="마법의 물약"){let deadCharacters=(p.discard||[]).filter(c=>c.type==="character"&&!c.alive);let deadLeader=p.leader&&!p.leader.alive?p.leader:null;let list=(deadLeader?[deadLeader]:[]).concat(deadCharacters);if(!list.length){toast("부활시킬 카드가 없습니다.");return}showModal("마법의 물약 · 부활할 카드 선택",list.map((c,i)=>'<button class="itemBtn" data-i="'+i+'">'+c.name+" · 기본 HP "+c.baseHp+"</button>").join(""));$("modalBody").querySelectorAll("button").forEach(b=>b.onclick=()=>{let c=list[+b.dataset.i];c.alive=true;c.hp=c.baseHp;c.status={};if(c.type==="character"){p.discard=p.discard.filter(x=>x!==c);p.field.push(c)}closeModal();done()})}
 else if(name==="도로늄"){foes.forEach(x=>x.c.status.radiation=true);done()}
 else if(name==="번개")chooseTarget("번개",foes,x=>{receiveDamage(x.c,5,null);done()});
@@ -148,7 +148,7 @@ else if(name==="치료제"){own.forEach(clearRemovable);done()}
 else if(name==="반사경")chooseOwn("반사경",own,x=>{x.status.reflectOnce=true;done()});
 else if(name==="순간이동"){let candidates=p.field.filter(x=>x.alive),b=p.reserve[0]||p.deck[0];if(!candidates.length||!b){toast("교체할 카드가 없습니다.");return}chooseOwn("순간이동 · 교체할 전장 카드",candidates,a=>{let i=p.field.indexOf(a);if(p.reserve[0]){p.reserve[0]=a;p.field[i]=b}else{p.deck[0]=a;p.field[i]=b}done()})}
 else if(name==="강탈"){let q=S.players.find(x=>x!==p);let pool=q?allCardPool(q).filter(x=>x.alive):[];if(!pool.length){toast("강탈 대상이 없습니다.");return}shuffle(pool);pool.slice(0,2).forEach(c=>{let oi=allCardPool(q).indexOf(c);if(oi>=0){if(q.deck.includes(c))q.deck.splice(q.deck.indexOf(c),1);else if(q.field.includes(c))q.field.splice(q.field.indexOf(c),1);else if(q.reserve.includes(c))q.reserve.splice(q.reserve.indexOf(c),1);p.reserve.push(c)}});done()}
-else if(name==="독"){foes.forEach(x=>{x.c.status.poisoned=true;x.c.status.poisonTurns=3});done()}
+else if(name==="독"){foes.forEach(x=>{x.c.status.poisoned=true;fxStatus(x.c,"poisoned","☠ 독");x.c.status.poisonTurns=3});done()}
 }
 function cardList(p){return allCardPool(p).map(c=>cardHTML(c)).join("")}
 function fxCard(c,kind){const el=document.querySelector('#arena .card[data-card="'+c.id+'"]');if(!el)return;el.classList.remove("attacker","hit","dead");void el.offsetWidth;el.classList.add(kind);setTimeout(()=>el.classList.remove(kind),700)}
@@ -199,8 +199,26 @@ function fxAttack(a,t,amount,opts={}){
   if(amount>0)fxPoint(t,"-"+amount,amount>=10?"crit":"");
   const ov=document.createElement("div");ov.className="fxOverlay fxOverlay-"+type;$("fxLayer").appendChild(ov);setTimeout(()=>ov.remove(),380);
 }
-function fxHeal(c,amount){fxPoint(c,"+"+amount,"heal");fxCard(c,"statusPulse")}
+function fxStatus(c,type,label){
+  const el=document.querySelector('#arena .card[data-card="'+c.id+'"]');if(!el)return;
+  const r=el.getBoundingClientRect(),layer=$("fxLayer");if(!layer)return;
+  const e=document.createElement("div");e.className="fxStatus fxStatus-"+type;e.textContent=label;
+  e.style.left=(r.left+r.width/2)+"px";e.style.top=(r.top+r.height*.18)+"px";
+  layer.appendChild(e);setTimeout(()=>e.remove(),1050);
+  const ring=document.createElement("div");ring.className="fxStatusRing fxStatusRing-"+type;
+  ring.style.left=(r.left+r.width/2)+"px";ring.style.top=(r.top+r.height/2)+"px";
+  layer.appendChild(ring);setTimeout(()=>ring.remove(),700);
+  fxCard(c,"statusPulse");
+}
+function fxHeal(c,amount){fxPoint(c,"+"+amount,"heal");fxCard(c,"statusPulse");if(amount>0)fxStatus(c,"heal","✚ 회복")}
 function fxDeath(c){fxCard(c,"dead");fxPoint(c,"💀 처치!","crit")}
+/* 상태 부여 연출: 실제 게임 수치/판정에는 관여하지 않음 */
+const _statusSet=(c,key,value,label)=>{
+  const before=c.status[key];
+  c.status[key]=value;
+  if(value&&!before)fxStatus(c,key,label);
+};
+
 function fxBuy(){const n=document.createElement("div");n.className="fxOverlay";$("fxLayer").appendChild(n);setTimeout(()=>n.remove(),380);toast("✨ 구매 완료")}
 function fxReveal(){const cards=[...document.querySelectorAll("#arena .card")];cards.forEach(el=>el.classList.add("faceDown"));cards.forEach((el,i)=>setTimeout(()=>{el.classList.remove("faceDown");el.classList.add("reveal");setTimeout(()=>el.classList.remove("reveal"),750)},i*70))}
 function fxTurn(){const el=$(".turn");if(!el)return;el.classList.remove("turnPulse");void el.offsetWidth;el.classList.add("turnPulse");setTimeout(()=>el.classList.remove("turnPulse"),600)}
