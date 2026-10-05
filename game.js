@@ -163,7 +163,44 @@ function fxTurn(){const el=$(".turn");if(!el)return;el.classList.remove("turnPul
 
 function cardHTML(c,click=false){let tags=[];if(c.status.stunned)tags.push("기절");if(c.status.burn)tags.push("화상");if(c.status.bleed)tags.push("출혈");if(c.status.poisoned)tags.push("독");if(c.status.radiation)tags.push("피폭");if(c.status.invuln)tags.push("🛡 무적");if(c.status.shield||c.status.snowShield)tags.push("🔰 보호막");if(c.status.guard)tags.push("🧱 피해감소");if(c.status.reflectOnce||c.status.reflect3)tags.push("↩ 반사");if(c.status.pierce)tags.push("⚡ 관통");if(c.status.nullifyNext)tags.push("❄ 다음 피해 무효");return '<div class="card '+(c.type==="leader"?"leader ":"")+(c.alive?"":"dead")+(click?" clickable":"")+'" data-card="'+c.id+'"><div class="head"><span>'+c.name+'</span><span class="stars">'+stars(c.star)+'</span></div><div class="attr">'+c.attr+(c.type==="leader"?" · LEADER":"")+'</div><div class="bar"><i style="width:'+clamp(c.hp/c.baseHp*100,0,100)+'%"></i></div><div class="hp">HP '+Math.max(0,c.hp)+' / '+c.baseHp+(c.cd>0?" · CD "+c.cd:"")+'</div><div class="desc">'+(c.type==="leader"?c.passive:c.desc)+'</div><div class="tags">'+tags.map(x=>'<span class="tag bad">'+x+"</span>").join("")+'</div></div>'}
 function render(){if(S.phase==="composition")renderComposition();else if(S.phase==="battle")renderBattle();else if(S.phase==="shop")renderShop()}
-function renderComposition(){go("composition");let p=S.players[S.compositionIndex];$("compInfo").textContent=p.dealing?p.name+" · 카드 지급 중…":p.name+" · 비공개 구성 · 5장 전장 선택";$("compProgress").textContent=(S.compositionIndex+1)+"/"+S.players.length+" 플레이어";const locked=!!p.dealing;const dealtClass=p.initialDealAnimated?"":" deal-in";$("compCards").innerHTML=p.hand.map((c,i)=>cardHTML(c,!locked).replace('data-card="'+c.id+'"','data-card="'+c.id+'" data-index="'+i+'"').replace('class="card ','class="card'+dealtClass+" "')).join("");document.querySelectorAll("#compCards .card").forEach(e=>{if(S.selected.includes(+e.dataset.index))e.classList.add("selected");e.onclick=()=>{if(p.dealing)return;let i=+e.dataset.index;if(S.selected.includes(i))S.selected=S.selected.filter(x=>x!==i);else if(S.selected.length<5)S.selected.push(i);const card=p.hand[i];const msg=S.selected.includes(i)?"🃏 전장에 배치":"↩️ 예비로 되돌림";toast(card.name+" · "+msg);renderComposition()}});if(!p.initialDealAnimated&&!p.dealing){p.dealing=true;renderComposition();renderDealOverlay(p);setTimeout(()=>{p.dealing=false;p.initialDealAnimated=true;renderComposition();toast("🃏 카드 26장 지급 완료 · 이제 전장을 구성하세요.");},1650)}}
+function renderComposition(){
+  go("composition");
+  const p=S.players[S.compositionIndex];
+  $("compInfo").textContent=p.dealing?p.name+" · 카드 지급 중…":p.name+" · 비공개 구성 · 5장 전장 선택";
+  $("compProgress").textContent=(S.compositionIndex+1)+"/"+S.players.length+" 플레이어";
+  const locked=!!p.dealing;
+  const dealtClass=p.initialDealAnimated?"":" deal-in";
+  $("compCards").innerHTML=p.hand.map((c,i)=>{
+    let html=cardHTML(c,!locked);
+    html=html.replace('data-card="'+c.id+'"','data-card="'+c.id+'" data-index="'+i+'" style="--deal-index:'+i+'"');
+    html=html.replace('class="card ','class="card'+dealtClass+' ');
+    return html;
+  }).join("");
+  document.querySelectorAll("#compCards .card").forEach(e=>{
+    if(S.selected.includes(+e.dataset.index))e.classList.add("selected");
+    e.onclick=()=>{
+      if(p.dealing)return;
+      const i=+e.dataset.index;
+      if(S.selected.includes(i))S.selected=S.selected.filter(x=>x!==i);
+      else if(S.selected.length<5)S.selected.push(i);
+      const card=p.hand[i];
+      const msg=S.selected.includes(i)?"🃏 전장에 배치":"↩️ 예비로 되돌림";
+      toast(card.name+" · "+msg);
+      renderComposition();
+    };
+  });
+  if(!p.initialDealAnimated&&!p.dealing){
+    p.dealing=true;
+    renderComposition();
+    renderDealOverlay(p);
+    setTimeout(()=>{
+      p.dealing=false;
+      p.initialDealAnimated=true;
+      renderComposition();
+      toast("🃏 카드 26장 지급 완료 · 이제 전장을 구성하세요.");
+    },1650);
+  }
+}
 function renderDealOverlay(p){$("compInfo").textContent=p.name+" · 카드 지급 중…";const overlay=document.createElement("div");overlay.className="dealOverlay";overlay.innerHTML='<div class="dealStack"><div class="dealCardBack"></div><div class="dealCardBack"></div><div class="dealCardBack"></div></div><strong>카드 26장 지급 중</strong><span>카드가 손패로 자연스럽게 들어옵니다…</span>';const host=$("compCards");host.parentElement.classList.add("dealingPanel");host.parentElement.appendChild(overlay);setTimeout(()=>{overlay.remove();host.parentElement.classList.remove("dealingPanel")},1600)}
 function chooseLeader(pi){let p=S.players[pi];if(!S.leaderDeck.length){toast("지도자 더미가 비었습니다.");finishComposition(pi);return}showModal(p.name+" · 지도자 선택",'<div class="selectGrid">'+S.leaderDeck.map((l,i)=>cardHTML(l,true).replace('data-card="'+l.id+'"','data-card="'+l.id+'" data-li="'+i+'"')).join("")+'</div>');$("modalBody").querySelectorAll(".card").forEach(e=>e.onclick=()=>{let l=S.leaderDeck.splice(+e.dataset.li,1)[0];p.leader=l;closeModal();finishComposition(pi)})}
 function chooseLeaderPlacement(pi){let p=S.players[pi],opts=[p.leader,...p.leaderStock].filter(Boolean);if(!opts.length){finishComposition(pi);return}showModal(p.name+" · 지도자 배치",'<div class="selectGrid">'+opts.map((l,i)=>cardHTML(l,true).replace('data-card="'+l.id+'"','data-card="'+l.id+'" data-li="'+i+'"')).join("")+'</div>');$("modalBody").querySelectorAll(".card").forEach(e=>e.onclick=()=>{let chosen=opts[+e.dataset.li];if(chosen!==p.leader){if(p.leader)S.leaderDeck.push(p.leader);p.leaderStock=p.leaderStock.filter(x=>x!==chosen);p.leader=chosen}else{p.leaderStock=p.leaderStock.filter(x=>x!==chosen)}shuffle(S.leaderDeck);closeModal();S.compositionIndex++;if(S.compositionIndex<S.players.length)renderComposition();else beginBattle()})}
