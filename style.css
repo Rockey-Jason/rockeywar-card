@@ -119,3 +119,7 @@ body.phaseTransition::after{content:"";position:fixed;inset:0;z-index:9997;backg
 .leaderSelectGrid .card{cursor:pointer;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
 .leaderSelectGrid .card.selected{transform:translateY(-7px) scale(1.025);border-color:#fff0a8;box-shadow:0 0 0 2px rgba(255,215,106,.34),0 0 30px rgba(255,215,106,.2)}
 @media(max-width:600px){.leaderSelectGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+.selectionStatus{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:12px 0;padding:11px 14px;border:1px solid rgba(110,180,255,.22);border-radius:14px;background:rgba(8,16,36,.72);font-size:12px}.selectionCount{min-width:52px;text-align:center;padding:5px 9px;border-radius:999px;font-weight:900;color:#dff2ff;background:rgba(70,150,255,.14);border:1px solid rgba(120,190,255,.28)}#compSelectionNames{color:#aab9cf}.selectionStatus.ready{border-color:rgba(255,215,106,.5);box-shadow:0 0 20px rgba(255,215,106,.08)}
+#compCards .card.selected{transform:translateY(-10px) scale(1.035);border-color:#8fd8ff;box-shadow:0 0 0 2px rgba(120,205,255,.42),0 0 28px rgba(80,170,255,.22)}#compCards .card.selected::before{content:"✓ 선택됨";position:absolute;top:7px;right:7px;padding:4px 8px;border-radius:999px;background:linear-gradient(135deg,#dff6ff,#63b9ff);color:#06101d;font-size:9px;font-weight:900;z-index:3;box-shadow:0 0 14px rgba(100,200,255,.35)}
