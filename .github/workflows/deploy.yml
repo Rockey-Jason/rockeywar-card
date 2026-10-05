@@ -149,9 +149,14 @@ jobs:
             await waitCompositionReady('2인 PvE player 0');
             for (let i = 0; i < 5; i++) await page.locator('#compCards .card').nth(i).click({force:true});
             await page.locator('#compDone').click({force:true});
-            await page.waitForTimeout(2000);
-            if (!(await active('#battle'))) throw new Error('PvE가 전투까지 진행되지 않습니다.');
-            await page.waitForTimeout(1000);
+            await page.locator('#battle.active').waitFor({state:'visible', timeout:10000});
+            await page.locator('#arena .player').first().waitFor({state:'visible', timeout:10000});
+
+            // Initial game state must be verified immediately, before the 650ms AI delay can act.
+            await page.waitForFunction(() => {
+              const players = document.querySelectorAll('#arena .player');
+              return players.length === 2 && [...players].every(p => p.querySelectorAll('.card:not(.leader)').length === 5);
+            }, null, {timeout:3000});
 
             // Initial game must show exactly 5 character cards per player and no leader.
             for (const player of await page.locator('#arena .player').all()) {
@@ -178,7 +183,8 @@ jobs:
             await waitCompositionReady('2인 PvE regression player 0');
             for (let i = 0; i < 5; i++) await page.locator('#compCards .card').nth(i).click({force:true});
             await page.locator('#compDone').click({force:true});
-            await page.waitForTimeout(2000);
+            await page.locator('#battle.active').waitFor({state:'visible', timeout:10000});
+            await page.waitForFunction(() => document.querySelectorAll('#arena .player').length === 2, null, {timeout:3000});
             if (!(await active('#battle'))) throw new Error('종료 분기 재테스트용 전투 진입 실패');
             const loseResult = await page.evaluate(() => window.__DORI_TEST__.forceGameOver(1));
             if (loseResult.phase !== 'end' || !loseResult.gameOver) throw new Error('패배 종료 상태가 정상적으로 종료되지 않습니다.');
@@ -196,7 +202,11 @@ jobs:
             await waitCompositionReady('4인 PvE player 0');
             for (let i = 0; i < 5; i++) await page.locator('#compCards .card').nth(i).click({force:true});
             await page.locator('#compDone').click({force:true});
-            await page.waitForTimeout(6500);
+            await page.locator('#battle.active').waitFor({state:'visible', timeout:10000});
+            await page.waitForFunction(() => {
+              const players = document.querySelectorAll('#arena .player');
+              return players.length === 4 && [...players].every(p => p.querySelectorAll('.card:not(.leader)').length === 5);
+            }, null, {timeout:5000});
             if (!(await active('#battle'))) throw new Error('4인 PvE가 전투까지 진행되지 않습니다.');
             const names = await page.locator('#arena .player .playerHead b').allTextContents();
             if (names.length !== 4) throw new Error('4인 PvE 플레이어 수가 잘못되었습니다.');
