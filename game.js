@@ -153,7 +153,52 @@ else if(name==="독"){foes.forEach(x=>{x.c.status.poisoned=true;x.c.status.poiso
 function cardList(p){return allCardPool(p).map(c=>cardHTML(c)).join("")}
 function fxCard(c,kind){const el=document.querySelector('#arena .card[data-card="'+c.id+'"]');if(!el)return;el.classList.remove("attacker","hit","dead");void el.offsetWidth;el.classList.add(kind);setTimeout(()=>el.classList.remove(kind),700)}
 function fxPoint(c,text,cls=""){const el=document.querySelector('#arena .card[data-card="'+c.id+'"]');if(!el)return;const r=el.getBoundingClientRect(),n=document.createElement("div");n.className="fxText "+cls;n.textContent=text;n.style.left=(r.left+r.width/2)+"px";n.style.top=(r.top+r.height*.25)+"px";$("fxLayer").appendChild(n);setTimeout(()=>n.remove(),1000)}
-function fxAttack(a,t,amount){fxCard(a,"attacker");fxCard(t,"hit");const el=document.querySelector('#arena .card[data-card="'+t.id+'"]');if(el){const r=el.getBoundingClientRect(),s=document.createElement("div");s.className="fxSlash";s.style.left=(r.left+r.width/2)+"px";s.style.top=(r.top+r.height/2)+"px";$("fxLayer").appendChild(s);setTimeout(()=>s.remove(),350)}if(amount>0)fxPoint(t,"-"+amount,amount>=10?"crit":"");const ov=document.createElement("div");ov.className="fxOverlay";$("fxLayer").appendChild(ov);setTimeout(()=>ov.remove(),380)}
+function attackFxType(a){
+  const n=a?.name||"", attr=a?.attr||"";
+  const map={
+    "화염구":"fireball","운석":"meteor","화산석":"lava","용암":"lava","불씨":"fire","횃불":"fire","불꽃":"fire","불도마뱀":"fire","태양":"sun",
+    "눈덩이":"ice","눈사람":"ice","눈폭풍":"blizzard","빙하":"glacier","빙결정":"freeze","얼음결정":"freeze","얼음골렘":"ice",
+    "회오리":"wind","돌풍":"wind","회오리바람":"tornado","매":"wind","태풍":"tornado","바람새":"wind",
+    "바위":"earth","자갈":"earth","땅곰":"earth","골렘":"earth","돌벽":"earth","석상":"earth","바위산":"earth",
+    "새싹":"nature","덩굴":"nature","민들레":"nature","나무":"nature","꽃":"nature","선인장":"nature","버섯":"nature","거대한 나무":"nature",
+    "돌이":"leader","윈터":"ice","모래":"sand","복돌이":"wind","앙버터":"fire","대파":"nature"
+  };
+  return map[n]||({불:"fire",얼음:"ice",바람:"wind",땅:"earth",풀:"nature"}[attr]||"physical");
+}
+function spawnAttackFx(type,r){
+  const layer=$("fxLayer"); if(!layer||!r)return;
+  const x=r.left+r.width/2,y=r.top+r.height/2;
+  const mk=(cls,text="")=>{const e=document.createElement("span");e.className="fxSkill "+cls;e.textContent=text;e.style.left=x+"px";e.style.top=y+"px";layer.appendChild(e);setTimeout(()=>e.remove(),900);return e};
+  if(type==="fire"||type==="fireball"){mk("fxFire","🔥");if(type==="fireball")mk("fxFireCore","●");}
+  else if(type==="lava"){mk("fxLava","◆");mk("fxFire","🔥");}
+  else if(type==="meteor"){mk("fxMeteor","☄");}
+  else if(type==="ice"||type==="freeze"){mk("fxIce","❄");mk("fxIceShard","✦");}
+  else if(type==="blizzard"){for(let i=0;i<7;i++){const e=mk("fxSnow","❄");e.style.setProperty("--i",i);e.style.setProperty("--drift",(i-3)*22+"px");}}
+  else if(type==="glacier"){mk("fxGlacier","❄");}
+  else if(type==="wind"){mk("fxWind","〰");}
+  else if(type==="tornado"){mk("fxTornado","🌀");}
+  else if(type==="nature"){mk("fxNature","✦");mk("fxLeaf","🍃");}
+  else if(type==="earth"){mk("fxEarth","◆");}
+  else if(type==="sand"){mk("fxSand","·");}
+  else if(type==="sun"){mk("fxSun","☀");}
+  else if(type==="leader"){mk("fxLeader","✦");}
+  else mk("fxPhysical","✦");
+}
+function fxAttack(a,t,amount,opts={}){
+  fxCard(a,"attacker");fxCard(t,"hit");
+  const el=document.querySelector('#arena .card[data-card="'+t.id+'"]');
+  const type=opts.fxType||attackFxType(a);
+  if(el){
+    const r=el.getBoundingClientRect();
+    spawnAttackFx(type,r);
+    const ring=document.createElement("div");
+    ring.className="fxImpact fxImpact-"+type;
+    ring.style.left=(r.left+r.width/2)+"px";ring.style.top=(r.top+r.height/2)+"px";
+    $("fxLayer").appendChild(ring);setTimeout(()=>ring.remove(),500);
+  }
+  if(amount>0)fxPoint(t,"-"+amount,amount>=10?"crit":"");
+  const ov=document.createElement("div");ov.className="fxOverlay fxOverlay-"+type;$("fxLayer").appendChild(ov);setTimeout(()=>ov.remove(),380);
+}
 function fxHeal(c,amount){fxPoint(c,"+"+amount,"heal");fxCard(c,"statusPulse")}
 function fxDeath(c){fxCard(c,"dead");fxPoint(c,"💀 처치!","crit")}
 function fxBuy(){const n=document.createElement("div");n.className="fxOverlay";$("fxLayer").appendChild(n);setTimeout(()=>n.remove(),380);toast("✨ 구매 완료")}
