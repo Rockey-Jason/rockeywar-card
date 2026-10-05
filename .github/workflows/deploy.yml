@@ -42,27 +42,67 @@ jobs:
           python3 -m http.server 4173 > /tmp/dori-server.log 2>&1 &
           echo $! > /tmp/dori-server.pid
 
-      - name: Verify buttons work
+      - name: Play through a full opening round
         run: |
           node - <<'NODE'
           const { chromium } = require('playwright');
           (async () => {
             const browser = await chromium.launch({headless:true});
-            const page = await browser.newPage();
+            const page = await browser.newPage({viewport:{width:1440,height:1000}});
             const errors = [];
             page.on('pageerror', e => errors.push(e.message));
             await page.goto('http://127.0.0.1:4173', {waitUntil:'networkidle'});
+
+            const active = id => page.locator(id).evaluate(el => el.classList.contains('active'));
+
             if (!(await page.locator('#startBtn').isVisible())) throw new Error('게임 시작 버튼이 보이지 않습니다.');
             await page.locator('#startBtn').click();
-            await page.waitForTimeout(150);
-            if (!(await page.locator('#setup').evaluate(el => el.classList.contains('active')))) {
-              throw new Error('게임 시작 버튼 클릭 후 설정 화면으로 이동하지 않습니다.');
-            }
+            await page.waitForTimeout(100);
+            if (!(await active('#setup'))) throw new Error('게임 시작 후 설정 화면이 열리지 않습니다.');
+
             await page.locator('#begin').click();
-            await page.waitForTimeout(300);
-            if (!(await page.locator('#composition').evaluate(el => el.classList.contains('active')))) {
-              throw new Error('전쟁 시작 버튼 클릭 후 캐릭터 구성 화면으로 이동하지 않습니다.');
+            await page.waitForTimeout(150);
+            if (!(await active('#composition'))) throw new Error('전쟁 시작 후 구성 화면이 열리지 않습니다.');
+
+            for (let player = 0; player < 2; player++) {
+              for (let i = 0; i < 5; i++) {
+                await page.locator('#compCards .card').nth(i).click();
+              }
+              if (await page.locator('#compCards .card.selected').count() !== 5) {
+                throw new Error('5장 선택 상태가 정상적으로 유지되지 않습니다. player=' + player);
+              }
+              await page.locator('#compDone').click();
+              await page.waitForTimeout(120);
+
+              if (await active('#modal')) {
+                const leaderCards = page.locator('#modal.show .card');
+                if (await leaderCards.count() === 0) throw new Error('지도자 선택 카드가 없습니다. player=' + player);
+                await leaderCards.first().click();
+                await page.waitForTimeout(120);
+              }
             }
+
+            if (!(await active('#battle'))) throw new Error('2명의 구성이 끝난 뒤 전투 화면으로 이동하지 않습니다.');
+            if (await page.locator('#arena .player').count() !== 2) throw new Error('전투 플레이어 수가 2명이 아닙니다.');
+
+            const activeCard = page.locator('#arena .player.active .card.clickable').first();
+            if (await activeCard.count() === 0) throw new Error('활성 플레이어의 행동 가능한 카드가 없습니다.');
+            await activeCard.click();
+            await page.waitForTimeout(120);
+
+            // Target-required actions must expose valid enemy/ally targets as clickable cards.
+            if (await page.locator('#arena .player:not(.active) .card.clickable').count() > 0) {
+              await page.locator('#arena .player:not(.active) .card.clickable').first().click();
+              await page.waitForTimeout(180);
+            } else if (await page.locator('#modal.show .itemBtn').count() > 0) {
+              await page.locator('#modal.show .itemBtn').first().click();
+              await page.waitForTimeout(120);
+              if (await page.locator('#arena .player:not(.active) .card.clickable').count() > 0) {
+                await page.locator('#arena .player:not(.active) .card.clickable').first().click();
+                await page.waitForTimeout(180);
+              }
+            }
+
             if (errors.length) throw new Error('브라우저 JS 오류: ' + errors.join(' | '));
             await browser.close();
           })().catch(async e => { console.error(e); process.exit(1); });
