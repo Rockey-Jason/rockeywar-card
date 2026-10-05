@@ -152,23 +152,25 @@ jobs:
             await page.locator('#battle.active').waitFor({state:'visible', timeout:10000});
             await page.locator('#arena .player').first().waitFor({state:'visible', timeout:10000});
 
-            // Initial game state must be verified immediately, before the 650ms AI delay can act.
-            await page.waitForFunction(() => {
-              const players = document.querySelectorAll('#arena .player');
-              return players.length === 2 && [...players].every(p => p.querySelectorAll('.card:not(.leader)').length === 5);
-            }, null, {timeout:3000});
-
-            // Initial game must show exactly 5 character cards per player and no leader.
-            for (const player of await page.locator('#arena .player').all()) {
-              const chars = player.locator('.card:not(.leader)');
-              if (await chars.count() !== 5) throw new Error('초기 전장 캐릭터가 정확히 5장이 아닙니다.');
-              if (await player.locator('.card.leader').count() !== 0) throw new Error('첫 게임에 지도자가 지급되었습니다.');
+            // Capture the complete initial state in one synchronous browser evaluation,
+            // before the 650ms AI delay can mutate the battlefield.
+            const initialState = await page.evaluate(() => [...document.querySelectorAll('#arena .player')].map(p => ({
+              chars: p.querySelectorAll('.card:not(.leader)').length,
+              leaders: p.querySelectorAll('.card.leader').length
+            })));
+            if (initialState.length !== 2 || initialState.some(x => x.chars !== 5 || x.leaders !== 0)) {
+              throw new Error('초기 전장 상태가 잘못되었습니다: ' + JSON.stringify(initialState));
             }
 
-            // Leader acquired later must appear alongside the 5 battlefield characters.
-            await page.evaluate(() => window.__DORI_TEST__.grantLeader(0));
-            if (await page.locator('#arena .player').first().locator('.card').count() !== 6) {
-              throw new Error('지도자를 얻은 뒤 전장에 5캐릭터 + 지도자가 표시되지 않습니다.');
+            // Grant a leader immediately after the snapshot, before any delayed AI action.
+            const leaderGranted = await page.evaluate(() => window.__DORI_TEST__.grantLeader(0));
+            if (!leaderGranted) throw new Error('테스트용 지도자 지급에 실패했습니다.');
+            const leaderState = await page.evaluate(() => {
+              const p = document.querySelector('#arena .player');
+              return {cards:p?.querySelectorAll('.card').length ?? -1, chars:p?.querySelectorAll('.card:not(.leader)').length ?? -1, leaders:p?.querySelectorAll('.card.leader').length ?? -1};
+            });
+            if (leaderState.cards !== 6 || leaderState.chars !== 5 || leaderState.leaders !== 1) {
+              throw new Error('지도자를 얻은 뒤 5캐릭터 + 지도자 상태가 잘못되었습니다: ' + JSON.stringify(leaderState));
             }
 
             // Verify both actual end-screen branches through the same battle-ending logic.
@@ -203,20 +205,19 @@ jobs:
             for (let i = 0; i < 5; i++) await page.locator('#compCards .card').nth(i).click({force:true});
             await page.locator('#compDone').click({force:true});
             await page.locator('#battle.active').waitFor({state:'visible', timeout:10000});
-            await page.waitForFunction(() => {
-              const players = document.querySelectorAll('#arena .player');
-              return players.length === 4 && [...players].every(p => p.querySelectorAll('.card:not(.leader)').length === 5);
-            }, null, {timeout:5000});
-            if (!(await active('#battle'))) throw new Error('4인 PvE가 전투까지 진행되지 않습니다.');
-            const names = await page.locator('#arena .player .playerHead b').allTextContents();
-            if (names.length !== 4) throw new Error('4인 PvE 플레이어 수가 잘못되었습니다.');
-            if (!names[0].includes('플레이어 1') || !names[1].includes('AI 2') || !names[2].includes('AI 3') || !names[3].includes('AI 4')) {
-              throw new Error('4인 PvE에서 플레이어/AI 이름 구성이 잘못되었습니다: ' + names.join(' | '));
-            }
-            for (const player of await page.locator('#arena .player').all()) {
-              if (await player.locator('.card:not(.leader)').count() !== 5) throw new Error('4인 PvE 초기 전장 캐릭터가 정확히 5장이 아닙니다.');
-              if (await player.locator('.card.leader').count() !== 0) throw new Error('4인 PvE 첫 전투에 지도자가 지급되었습니다.');
-            }
+            // Validate the whole 4-player initial state in one synchronous snapshot.
+            const pve4State = await page.evaluate(() => [...document.querySelectorAll('#arena .player')].map(p => ({
+              name: p.querySelector('.playerHead b')?.textContent || '',
+              chars: p.querySelectorAll('.card:not(.leader)').length,
+              leaders: p.querySelectorAll('.card.leader').length
+            })));
+            if (pve4State.length !== 4) throw new Error('4인 PvE 플레이어 수가 잘못되었습니다: ' + JSON.stringify(pve4State));
+            const expectedNames = ['플레이어 1','AI 2','AI 3','AI 4'];
+            pve4State.forEach((p, i) => {
+              if (p.name !== expectedNames[i] || p.chars !== 5 || p.leaders !== 0) {
+                throw new Error('4인 PvE 초기 상태가 잘못되었습니다: ' + JSON.stringify(pve4State));
+              }
+            });
 
             await browser.close();
           })().catch(async e => { console.error(e); process.exit(1); });
