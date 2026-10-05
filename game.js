@@ -326,6 +326,17 @@ function aiTurnIfNeeded(){
   return true;
 }
 function render(){if(S.phase==="composition")renderComposition();else if(S.phase==="battle")renderBattle();else if(S.phase==="shop")renderShop()}
+function cardPreviewHTML(c){
+  if(!c)return '<div class="fieldPreviewCard"><span class="previewName">빈 슬롯</span></div>';
+  const leader=c.type==="leader";
+  return '<div class="fieldPreviewCard">'+
+    (leader?'<span class="previewBadge">👑 LEADER</span>':'')+
+    '<span class="previewName">'+c.name+'</span>'+
+    '<span class="previewAttr">'+c.attr+'</span>'+
+    '<span class="previewStars">'+stars(c.star)+'</span>'+
+    '<span class="previewHp">HP '+c.hp+'/'+c.baseHp+'</span>'+
+  '</div>';
+}
 function renderComposition(){
   go("composition");
   const current=S.players[S.compositionIndex];
@@ -352,6 +363,13 @@ function renderComposition(){
     $("compLeaders").innerHTML="";
   }
   $("compProgress").textContent=(S.compositionIndex+1)+"/"+S.players.length+" 플레이어";
+  const previewSlots=S.selected.map(i=>p.hand[i]).filter(Boolean);
+  const previewLeader=leaderOptions.find(l=>l.id===p.selectedLeaderId)||null;
+  $("compPreviewStatus").textContent=previewSlots.length+" / 5 · "+(previewLeader?"👑 "+previewLeader.name:"지도자 없음");
+  $("compFieldPreview").innerHTML=previewSlots.map(c=>'<div class="fieldPreviewSlot filled">'+cardPreviewHTML(c)+'</div>').join("")
+    +Array.from({length:5-previewSlots.length},()=>'<div class="fieldPreviewSlot empty"><span>빈 슬롯</span></div>').join("")
+    +(previewLeader?'<div class="fieldPreviewLeader">'+cardPreviewHTML(previewLeader)+'</div>':'<div class="fieldPreviewLeader empty"><span>지도자<br>빈 슬롯</span></div>');
+
   const selectedNames=S.selected.map(i=>p.hand[i]?.name).filter(Boolean);
   $("compSelectionStatus").innerHTML="<span class=\"selectionCount\">"+selectedNames.length+" / 5</span><span id=\"compSelectionNames\">"+(selectedNames.length?selectedNames.map((n,i)=>(i+1)+". "+n).join(" · "):"전장에 배치할 캐릭터를 선택하세요.")+"</span>";
   const locked=!!p.dealing;
