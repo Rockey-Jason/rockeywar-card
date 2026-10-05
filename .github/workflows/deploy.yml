@@ -72,8 +72,8 @@ jobs:
             for (let player = 0; player < 2; player++) {
               step('composition player ' + player);
               await page.locator('#composition.active').waitFor({state:'visible'});
-              await page.locator('#compCards .card').first().waitFor({state:'visible', timeout:10000});
               await page.waitForFunction(() => document.querySelectorAll('#compCards .card').length >= 26, null, {timeout:10000});
+              await page.waitForFunction(() => !document.querySelector('#compInfo')?.textContent.includes('카드 지급 중'), null, {timeout:10000});
               for (let i = 0; i < 5; i++) {
                 await page.locator('#compCards .card').nth(i).click({force:true});
               }
@@ -119,8 +119,8 @@ jobs:
             await page.locator('#begin').click({force:true});
             for (let player = 0; player < 4; player++) {
               await page.locator('#composition.active').waitFor({state:'visible'});
-              await page.locator('#compCards .card').first().waitFor({state:'visible', timeout:10000});
               await page.waitForFunction(() => document.querySelectorAll('#compCards .card').length >= 26, null, {timeout:10000});
+              await page.waitForFunction(() => !document.querySelector('#compInfo')?.textContent.includes('카드 지급 중'), null, {timeout:10000});
               for (let i = 0; i < 5; i++) await page.locator('#compCards .card').nth(i).click({force:true});
               await page.locator('#compDone').click({force:true});
               await page.waitForTimeout(60);
@@ -138,8 +138,8 @@ jobs:
             await page.locator('#begin').click({force:true});
             // PvE에서는 사람만 직접 5장을 구성하고 AI는 스스로 구성한다.
             await page.locator('#composition.active').waitFor({state:'visible'});
-            await page.locator('#compCards .card').first().waitFor({state:'visible', timeout:10000});
             await page.waitForFunction(() => document.querySelectorAll('#compCards .card').length >= 26, null, {timeout:10000});
+              await page.waitForFunction(() => !document.querySelector('#compInfo')?.textContent.includes('카드 지급 중'), null, {timeout:10000});
             for (let i = 0; i < 5; i++) await page.locator('#compCards .card').nth(i).click({force:true});
             await page.locator('#compDone').click({force:true});
             await page.waitForTimeout(2000);
