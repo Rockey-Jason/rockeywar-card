@@ -162,6 +162,53 @@ function fxReveal(){const cards=[...document.querySelectorAll("#arena .card")];c
 function fxTurn(){const el=$(".turn");if(!el)return;el.classList.remove("turnPulse");void el.offsetWidth;el.classList.add("turnPulse");setTimeout(()=>el.classList.remove("turnPulse"),600)}
 
 function cardHTML(c,click=false){let tags=[];if(c.status.stunned)tags.push("기절");if(c.status.burn)tags.push("화상");if(c.status.bleed)tags.push("출혈");if(c.status.poisoned)tags.push("독");if(c.status.radiation)tags.push("피폭");if(c.status.invuln)tags.push("🛡 무적");if(c.status.shield||c.status.snowShield)tags.push("🔰 보호막");if(c.status.guard)tags.push("🧱 피해감소");if(c.status.reflectOnce||c.status.reflect3)tags.push("↩ 반사");if(c.status.pierce)tags.push("⚡ 관통");if(c.status.nullifyNext)tags.push("❄ 다음 피해 무효");return '<div class="card '+(c.type==="leader"?"leader ":"")+(c.alive?"":"dead")+(click?" clickable":"")+'" data-card="'+c.id+'"><div class="head"><span>'+c.name+'</span><span class="stars">'+stars(c.star)+'</span></div><div class="attr">'+c.attr+(c.type==="leader"?" · LEADER":"")+'</div><div class="bar"><i style="width:'+clamp(c.hp/c.baseHp*100,0,100)+'%"></i></div><div class="hp">HP '+Math.max(0,c.hp)+' / '+c.baseHp+(c.cd>0?" · CD "+c.cd:"")+'</div><div class="desc">'+(c.type==="leader"?c.passive:c.desc)+'</div><div class="tags">'+tags.map(x=>'<span class="tag bad">'+x+"</span>").join("")+'</div></div>'}
+function isAI(pi){return S.mode==="pve"&&pi===S.count-1}
+function aiTargetScore(x){
+  const c=x.c||x;
+  return (c.hp<=8?1000:0)+(c.star*18)-(c.hp*.35)+(c.hp<c.baseHp*.45?80:0);
+}
+function aiBestTarget(pi){
+  const foes=enemies(pi);
+  return foes.slice().sort((a,b)=>aiTargetScore(b)-aiTargetScore(a))[0]||null;
+}
+function aiBestOwn(pi){
+  return alive(S.players[pi]).slice().sort((a,b)=>(1-a.hp/a.baseHp)-(1-b.hp/b.baseHp)).reverse()[0]||null;
+}
+function aiChooseField(p){
+  const pool=p.hand.filter(c=>c&&c.type==="character"&&c.alive);
+  return pool.slice().sort((a,b)=>
+    (b.star*18+b.baseHp*.45+(b.attr==="얼음"||b.attr==="땅"?5:0))-
+    (a.star*18+a.baseHp*.45+(a.attr==="얼음"||a.attr==="땅"?5:0))
+  ).slice(0,5);
+}
+function aiChooseLeader(p){
+  return (p.leaderStock||[]).slice().sort((a,b)=>{
+    const av=p.field.filter(c=>c.attr===a.attr).length;
+    const bv=p.field.filter(c=>c.attr===b.attr).length;
+    return (b.star*10+b.baseHp*.1+bv*8)-(a.star*10+a.baseHp*.1+av*8);
+  })[0]||null;
+}
+function aiFinishComposition(pi){
+  const p=S.players[pi], chosen=aiChooseField(p), set=new Set(chosen);
+  const rest=p.hand.filter(c=>!set.has(c));
+  p.field=chosen;p.deck=rest.slice(0,20);p.reserve=rest.slice(20,21);p.hand=[];
+  if(p.leaderStock.length){const l=aiChooseLeader(p);if(l){p.leaderStock=p.leaderStock.filter(x=>x!==l);p.leader=l}}
+  S.selected=[];S.compositionIndex++;
+  if(S.compositionIndex<S.players.length)renderComposition();else beginBattle();
+}
+function aiTurnIfNeeded(){
+  if(!isAI(S.active)||S.phase!=="battle")return false;
+  setTimeout(()=>{
+    if(!isAI(S.active)||S.phase!=="battle")return;
+    const p=S.players[S.active], cards=alive(p);
+    if(!cards.length)return;
+    const c=cards.slice().sort((a,b)=>(b.star*18+b.hp*.25)-(a.star*18+a.hp*.25))[0];
+    toast("🤖 AI 판단 · "+c.name);
+    if(c.type==="leader"){useLeader(c,S.active);return}
+    useCharacter(c,S.active);
+  },420);
+  return true;
+}
 function render(){if(S.phase==="composition")renderComposition();else if(S.phase==="battle")renderBattle();else if(S.phase==="shop")renderShop()}
 function renderComposition(){
   go("composition");
