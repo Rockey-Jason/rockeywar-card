@@ -164,3 +164,24 @@ body.phaseTransition::after{content:"";position:fixed;inset:0;z-index:9997;backg
 @keyframes fxLeader{0%{transform:translate(-50%,-50%) scale(.25) rotate(-90deg);opacity:0}30%{opacity:1}100%{transform:translate(-50%,-50%) scale(1.6) rotate(90deg);opacity:0}}
 @keyframes fxPhysical{0%{transform:translate(-50%,-50%) scale(.2);opacity:0}30%{opacity:1}100%{transform:translate(-50%,-50%) scale(1.5) rotate(90deg);opacity:0}}
 @keyframes fxImpact{0%{transform:translate(-50%,-50%) scale(.15);opacity:0}25%{opacity:1}100%{transform:translate(-50%,-50%) scale(1.6);opacity:0}}
+
+
+/* === BUFF / DEBUFF STATUS FX === */
+.fxStatus{position:absolute;z-index:10001;pointer-events:none;transform:translate(-50%,-50%);font-weight:1000;font-size:clamp(13px,2.2vw,21px);letter-spacing:.02em;text-shadow:0 2px 10px #000,0 0 18px currentColor;white-space:nowrap;animation:statusFloat 1.02s cubic-bezier(.2,.8,.2,1) forwards}
+.fxStatusRing{position:absolute;z-index:9999;pointer-events:none;width:86px;height:86px;border-radius:50%;transform:translate(-50%,-50%) scale(.45);opacity:0;border:2px solid currentColor;box-shadow:0 0 20px currentColor;animation:statusRing .68s ease-out forwards}
+.fxStatus-burn{color:#ff743d}.fxStatus-poisoned{color:#b96cff}.fxStatus-radiation{color:#b9ff55}.fxStatus-invuln,.fxStatus-shield{color:#aeeaff}.fxStatus-guard,.fxStatus-dmgDown{color:#ffd98a}.fxStatus-attackUp{color:#ff6470}.fxStatus-attackDown{color:#7bb9ff}.fxStatus-stunned{color:#fff07a}.fxStatus-heal{color:#68f5a5}
+.fxStatus-burn::after{content:"";position:absolute;width:24px;height:24px;border-radius:50%;background:#ff6b35;filter:blur(8px);left:50%;top:50%;z-index:-1;animation:ember .55s ease-out forwards}
+.fxStatus-poisoned::after{content:"☁";font-size:24px;position:absolute;left:50%;top:70%;opacity:.7;animation:poisonCloud .7s ease-out forwards}
+.fxStatus-radiation::after{content:"☢";font-size:34px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);opacity:.45;animation:radPulse .8s ease-out infinite}
+.fxStatus-invuln::after,.fxStatus-shield::after{content:"";position:absolute;inset:-12px -22px;border:2px solid currentColor;border-radius:50%;opacity:.5;animation:shieldSpin .8s linear infinite}
+.fxStatus-attackUp::after{content:"↑";position:absolute;left:50%;top:100%;font-size:25px;animation:upArrow .5s ease-out forwards}
+.fxStatus-attackDown::after{content:"↓";position:absolute;left:50%;top:100%;font-size:25px;animation:downArrow .5s ease-out forwards}
+.fxStatusRing-burn{color:#ff6536}.fxStatusRing-poisoned{color:#ad62ff}.fxStatusRing-radiation{color:#baff45}.fxStatusRing-invuln,.fxStatusRing-shield{color:#9deaff}.fxStatusRing-guard,.fxStatusRing-dmgDown{color:#ffd36a}.fxStatusRing-attackUp{color:#ff5869}.fxStatusRing-attackDown{color:#6faeff}.fxStatusRing-stunned{color:#fff078}.fxStatusRing-heal{color:#58ee9b}
+@keyframes statusFloat{0%{transform:translate(-50%,-50%) scale(.55);opacity:0}18%{opacity:1}100%{transform:translate(-50%,-115px) scale(1.08);opacity:0}}
+@keyframes statusRing{0%{transform:translate(-50%,-50%) scale(.25);opacity:0}25%{opacity:.9}100%{transform:translate(-50%,-50%) scale(1.55);opacity:0}}
+@keyframes ember{0%{transform:translate(-50%,-50%) scale(.2);opacity:0}35%{opacity:1}100%{transform:translate(-50%,-100px) scale(1.4);opacity:0}}
+@keyframes poisonCloud{0%{transform:translate(-50%,0) scale(.5);opacity:0}30%{opacity:.8}100%{transform:translate(-50%,-55px) scale(1.5);opacity:0}}
+@keyframes radPulse{0%{transform:translate(-50%,-50%) scale(.65);opacity:.2}50%{opacity:.7}100%{transform:translate(-50%,-50%) scale(1.5);opacity:0}}
+@keyframes shieldSpin{from{transform:rotate(0deg) scale(.9)}to{transform:rotate(360deg) scale(1.08)}}
+@keyframes upArrow{from{transform:translate(-50%,0);opacity:0}to{transform:translate(-50%,-22px);opacity:0}}
+@keyframes downArrow{from{transform:translate(-50%,0);opacity:0}to{transform:translate(-50%,12px);opacity:0}}
