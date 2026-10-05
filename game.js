@@ -56,7 +56,7 @@ function chooseTarget(title,arr,cb){if(S.mode==="pve"&&S.active===S.count-1){if(
 function chooseOwn(title,arr,cb){if(S.mode==="pve"&&S.active===S.count-1){if(!arr.length)return;cb(arr.slice().sort((a,b)=>(a.c||a).hp-(b.c||b).hp)[0]);return}S.pending={type:"own",arr,cb};render();toast(title+" — 아군을 선택하세요.")}
 function selectableCards(){if(!S.pending)return new Set();return new Set(S.pending.arr.map(x=>x.c||x))}
 function clearPending(){S.pending=null}
-function performAttack(attacker,target,base,opts={}){if(!attacker.alive)return false;if(attacker.status.stunned)return false;let amount=dmgAmount(attacker,target,base,opts);receiveDamage(target,amount,attacker,opts);return true}
+function performAttack(attacker,target,base,opts={}){if(!attacker.alive)return false;if(attacker.status.stunned)return false;let owner=S.players.find(p=>owned(p,attacker));if(attacker.status.randomTarget&&owner){let pool=enemies(owner.id);if(pool.length){target=pool[Math.floor(Math.random()*pool.length)].c;delete attacker.status.randomTarget}}let amount=dmgAmount(attacker,target,base,opts);receiveDamage(target,amount,attacker,opts);return true}
 
 function useCharacter(c,pi){let p=S.players[pi];if(c.cd>0){toast("쿨타임 "+c.cd+"턴");return}if(c.status.stunned){toast(c.name+"은(는) 행동 불가 상태입니다.");return}
 const n=c.name;const foe=enemies(pi);const own=alive(p);
