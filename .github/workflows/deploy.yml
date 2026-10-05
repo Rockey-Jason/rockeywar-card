@@ -16,8 +16,61 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  test:
+    name: Test game controls
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check JavaScript syntax
+        run: node --check game.js
+
+      - name: Install Playwright
+        run: npm init -y && npm install --no-save playwright
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Start local server
+        run: |
+          python3 -m http.server 4173 > /tmp/dori-server.log 2>&1 &
+          echo $! > /tmp/dori-server.pid
+
+      - name: Verify buttons work
+        run: |
+          node - <<'NODE'
+          const { chromium } = require('playwright');
+          (async () => {
+            const browser = await chromium.launch({headless:true});
+            const page = await browser.newPage();
+            const errors = [];
+            page.on('pageerror', e => errors.push(e.message));
+            await page.goto('http://127.0.0.1:4173', {waitUntil:'networkidle'});
+            if (!(await page.locator('#startBtn').isVisible())) throw new Error('게임 시작 버튼이 보이지 않습니다.');
+            await page.locator('#startBtn').click();
+            await page.waitForTimeout(150);
+            if (!(await page.locator('#setup').evaluate(el => el.classList.contains('active')))) {
+              throw new Error('게임 시작 버튼 클릭 후 설정 화면으로 이동하지 않습니다.');
+            }
+            await page.locator('#begin').click();
+            await page.waitForTimeout(300);
+            if (!(await page.locator('#composition').evaluate(el => el.classList.contains('active')))) {
+              throw new Error('전쟁 시작 버튼 클릭 후 캐릭터 구성 화면으로 이동하지 않습니다.');
+            }
+            if (errors.length) throw new Error('브라우저 JS 오류: ' + errors.join(' | '));
+            await browser.close();
+          })().catch(async e => { console.error(e); process.exit(1); });
+          NODE
+
   deploy:
     name: Build and Deploy
+    needs: test
     runs-on: ubuntu-latest
 
     environment:
