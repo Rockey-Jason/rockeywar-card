@@ -145,6 +145,38 @@ jobs:
             if (!(await active('#battle'))) throw new Error('PvE가 전투까지 진행되지 않습니다.');
             await page.waitForTimeout(1000);
 
+            // Initial game must show exactly 5 character cards per player and no leader.
+            for (const player of await page.locator('#arena .player').all()) {
+              const chars = player.locator('.card:not(.leader)');
+              if (await chars.count() !== 5) throw new Error('초기 전장 캐릭터가 정확히 5장이 아닙니다.');
+              if (await player.locator('.card.leader').count() !== 0) throw new Error('첫 게임에 지도자가 지급되었습니다.');
+            }
+
+            // Leader acquired later must appear alongside the 5 battlefield characters.
+            await page.evaluate(() => window.__DORI_TEST__.grantLeader(0));
+            if (await page.locator('#arena .player').first().locator('.card').count() !== 6) {
+              throw new Error('지도자를 얻은 뒤 전장에 5캐릭터 + 지도자가 표시되지 않습니다.');
+            }
+
+            // Verify both actual end-screen branches through the same battle-ending logic.
+            const winResult = await page.evaluate(() => window.__DORI_TEST__.forceGameOver(0));
+            if (winResult.phase !== 'end' || !winResult.gameOver) throw new Error('승리 종료 상태가 정상적으로 종료되지 않습니다.');
+            if (!(await page.locator('#winner').textContent()).includes('플레이어 1')) throw new Error('승리 화면의 승자가 잘못 표시됩니다.');
+
+            await page.reload({waitUntil:'networkidle'});
+            await page.locator('#startBtn').click({force:true});
+            await page.locator('#begin').click({force:true});
+            for (let player = 0; player < 2; player++) {
+              await page.waitForTimeout(1750);
+              for (let i = 0; i < 5; i++) await page.locator('#compCards .card').nth(i).click({force:true});
+              await page.locator('#compDone').click({force:true});
+              await page.waitForTimeout(80);
+            }
+            if (!(await active('#battle'))) throw new Error('종료 분기 재테스트용 전투 진입 실패');
+            const loseResult = await page.evaluate(() => window.__DORI_TEST__.forceGameOver(1));
+            if (loseResult.phase !== 'end' || !loseResult.gameOver) throw new Error('패배 종료 상태가 정상적으로 종료되지 않습니다.');
+            if (!(await page.locator('#winner').textContent()).includes('AI')) throw new Error('패배 상황에서 상대 승리 화면이 잘못 표시됩니다.');
+
             if (errors.length) throw new Error('브라우저 JS 오류: ' + errors.join(' | '));
             await browser.close();
           })().catch(async e => { console.error(e); process.exit(1); });
