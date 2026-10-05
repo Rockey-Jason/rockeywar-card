@@ -53,7 +53,7 @@ jobs:
             page.setDefaultTimeout(5000);
             page.on('pageerror', e => errors.push(e.message));
             const step = m => console.log('[PLAYTEST]', m);
-            await page.goto('http://127.0.0.1:4173', {waitUntil:'networkidle'});
+            await page.goto('http://127.0.0.1:4173/?test=1', {waitUntil:'networkidle'});
 
             const active = id => page.locator(id).evaluate(el => el.classList.contains('active'));
 
