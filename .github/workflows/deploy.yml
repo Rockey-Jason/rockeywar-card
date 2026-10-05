@@ -81,7 +81,7 @@ jobs:
               await page.locator('#compDone').click({force:true});
               await page.waitForTimeout(120);
 
-              if (await active('#modal')) {
+              if (await page.locator('#modal.show').count()) {
                 const leaderCards = page.locator('#modal.show .card');
                 if (await leaderCards.count() === 0) throw new Error('지도자 선택 카드가 없습니다. player=' + player);
                 step('leader choice ' + player);
