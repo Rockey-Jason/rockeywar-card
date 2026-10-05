@@ -44,7 +44,7 @@ function all(p){return [...p.field,p.leader].filter(Boolean)}
 function alive(p){return all(p).filter(c=>c.alive&&c.hp>0)}
 function enemies(pi){return S.players.flatMap((p,i)=>i===pi?[]:alive(p).map(c=>({p,i,c})))}
 function topDeck(p){return p.deck.filter(c=>c.alive)}
-function owned(p,c){return p.field.includes(c)||p.leader===c}
+function owned(p,c){return p.field.includes(c)||p.leader===c||p.deck.includes(c)||p.reserve.includes(c)||p.discard.includes(c)}
 function allCardPool(p){return [...p.field,p.leader,...p.deck,...p.reserve,...p.discard]}
 function allElement(p,a){return all(p).filter(c=>c.alive&&c.attr===a)}
 function uniformField(p,a){let aCards=p.field.filter(c=>c.alive);return aCards.length===5&&aCards.every(c=>c.attr===a)}
