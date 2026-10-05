@@ -165,14 +165,66 @@ function cardHTML(c,click=false){let tags=[];if(c.status.stunned)tags.push("기�
 function isAI(pi){return S.mode==="pve"&&pi===S.count-1}
 function aiTargetScore(x){
   const c=x.c||x;
-  return (c.hp<=8?1000:0)+(c.star*18)-(c.hp*.35)+(c.hp<c.baseHp*.45?80:0);
+  if(!c||!c.alive)return -999999;
+  const owner=S.players.find(p=>owned(p,c));
+  const missing=Math.max(0,c.baseHp-c.hp);
+  const danger=(c.star||0)*24+(c.hp<=8?420:0)+(c.hp/c.baseHp<.35?150:0);
+  const statuses=(c.status.stunned?180:0)+(c.status.bleed?45:0)+(c.status.poisoned?35:0)+(c.status.burn?25:0);
+  const leader=(c.type==="leader"?260:0);
+  return danger+statuses+leader+missing*.35;
 }
 function aiBestTarget(pi){
   const foes=enemies(pi);
   return foes.slice().sort((a,b)=>aiTargetScore(b)-aiTargetScore(a))[0]||null;
 }
 function aiBestOwn(pi){
-  return alive(S.players[pi]).slice().sort((a,b)=>(1-a.hp/a.baseHp)-(1-b.hp/b.baseHp)).reverse()[0]||null;
+  return alive(S.players[pi]).slice().sort((a,b)=>{
+    const ar=(a.baseHp-a.hp)/Math.max(1,a.baseHp), br=(b.baseHp-b.hp)/Math.max(1,b.baseHp);
+    const as=(a.status.stunned?90:0)+(a.status.burn?30:0)+(a.status.poisoned?30:0);
+    const bs=(b.status.stunned?90:0)+(b.status.burn?30:0)+(b.status.poisoned?30:0);
+    return (br*100+bs)-(ar*100+as);
+  })[0]||null;
+}
+function aiCardScore(c,pi){
+  if(!c||!c.alive||c.cd>0||c.status.stunned)return -999999;
+  const p=S.players[pi],foes=enemies(pi),own=alive(p);
+  const lowEnemy=foes.filter(x=>x.c.hp<=10).length;
+  const lowOwn=own.filter(x=>x.hp/x.baseHp<.45).length;
+  let v=c.star*22+c.hp*.12;
+  const n=c.name;
+  if(["화염구","매","땅곰","눈덩이","불꽃","자갈","불씨","횃불","용암","화산석"].includes(n))v+=70+lowEnemy*95;
+  if(["눈사람","눈폭풍","운석","빙하","태풍"].includes(n))v+=55+foes.length*32;
+  if(["빙결정","얼음결정","펭귄","덩굴","서리","얼음골렘"].includes(n))v+=45+foes.filter(x=>x.c.star>=4).length*35;
+  if(["새싹","풀잎","꽃","민들레","태양","얼음벽","보석","네잎클로버","바위","나무","돌벽"].includes(n))v+=lowOwn*70;
+  if(["회오리","돌풍","회오리바람","바람","강탈"].includes(n))v+=foes.length*24;
+  if(n==="광부")v+=p.items.length<2?45:10;
+  if(n==="깃털"||n==="바람새")v+=75;
+  if(n==="不")v=-500;
+  return v;
+}
+function aiLeaderSkillScore(name,skill,pi){
+  const p=S.players[pi],foes=enemies(pi),own=alive(p);
+  const low=foes.filter(x=>x.c.hp/x.c.baseHp<.4).length, ownLow=own.filter(x=>x.hp/x.baseHp<.5).length;
+  const high=foes.filter(x=>x.c.star>=4).length;
+  if(name==="돌이")return skill==="스킬 1"?160+low*100:120+foes.length*35;
+  if(name==="식빵이")return ownLow>0?180:80;
+  if(name==="윈터")return skill==="스킬 1"?220+low*120:150+high*50;
+  if(name==="모래")return skill==="스킬 2"?180+low*100:100+foes.length*30;
+  if(name==="복돌이")return skill==="스킬 1"?170+low*100:skill==="스킬 4"?140+foes.length*40:110;
+  if(name==="스노우")return skill==="스킬 2"&&own.some(x=>Object.keys(x.status).some(k=>/stun|burn|bleed|poison|radiation|dmgDown|attackDown/.test(k)))?210:130;
+  if(name==="앙버터")return skill==="스킬 3"?170+foes.length*30:skill==="스킬 1"?150+low*80:110;
+  if(name==="대파")return skill==="스킬 1"?180+low*110:skill==="스킬 2"?150+ownLow*80:100;
+  return 50;
+}
+function aiChooseLeaderSkill(c,pi,options){
+  return options.slice().sort((a,b)=>aiLeaderSkillScore(c.name,b[0],pi)-aiLeaderSkillScore(c.name,a[0],pi))[0];
+}
+function aiPassTurn(pi){
+  if(S.phase!=="battle"||S.active!==pi)return;
+  toast("🤖 AI · 사용할 수 있는 카드가 없어 턴을 넘깁니다.");
+  const idx=S.initiative.indexOf(pi),next=S.initiative[(idx+1)%S.initiative.length];
+  if(next===S.initiative[0]){S.turn++;endRound();}
+  S.active=next;checkEnd();render();setTimeout(()=>aiTurnIfNeeded(),420);
 }
 function aiChooseField(p){
   const pool=p.hand.filter(c=>c&&c.type==="character"&&c.alive);
@@ -236,6 +288,8 @@ function renderComposition(){
     $("compLeaders").innerHTML="";
   }
   $("compProgress").textContent=(S.compositionIndex+1)+"/"+S.players.length+" 플레이어";
+  const selectedNames=S.selected.map(i=>p.hand[i]?.name).filter(Boolean);
+  $("compSelectionStatus").innerHTML="<span class=\"selectionCount\">"+selectedNames.length+" / 5</span><span id=\"compSelectionNames\">"+(selectedNames.length?selectedNames.map((n,i)=>(i+1)+". "+n).join(" · "):"전장에 배치할 캐릭터를 선택하세요.")+"</span>";
   const locked=!!p.dealing;
   const dealtClass=p.initialDealAnimated?"":" deal-in";
   $("compCards").innerHTML=p.hand.map((c,i)=>{
@@ -245,7 +299,7 @@ function renderComposition(){
     return html;
   }).join("");
   document.querySelectorAll("#compCards .card").forEach(e=>{
-    if(S.selected.includes(+e.dataset.index))e.classList.add("selected");
+    if(S.selected.includes(+e.dataset.index)){e.classList.add("selected");e.setAttribute("aria-selected","true")}else e.setAttribute("aria-selected","false");
     e.onclick=()=>{
       if(p.dealing)return;
       const i=+e.dataset.index;
@@ -278,9 +332,27 @@ function beginBattle(){S.phase="battle";S.turn=1;S.round=1;S.active=S.initiative
 function applyStartRound(p){if(!p.leader)return;let l=p.leader;if(l.name==="윈터"&&!uniformTopDeck(p,"얼음"))receiveDamage(l,5,null);if(l.name==="앙버터")alive(p).forEach(c=>c.hp=Math.min(c.baseHp,c.hp+3));if(l.name==="대파")l.hp=Math.min(l.baseHp,l.hp+5);if(l.name==="식빵이"&&uniformTopDeck(p,"음식"))l.hp=Math.min(l.baseHp,l.hp+5);if(l.name==="모래")p.items.push(drawItem());if(l.name==="스노우"&&S.round%3===0&&uniformTopDeck(p,"얼음"))p.deck.filter(c=>c.alive).forEach(c=>c.status.snowShield=true);alive(p).forEach(c=>{if(c.status.burn){receiveDamage(c,c.status.burn,null);if(c.status.burnTurns>0)c.status.burnTurns--}if(c.status.bleed)receiveDamage(c,c.status.bleed,null);if(c.status.poisoned){receiveDamage(c,1,null);c.status.poisonTurns--;if(c.status.poisonTurns<=0)c.status.poisoned=false}if(c.status.radiation){c.status.radiationTurns=(c.status.radiationTurns||0)+1;if(c.status.radiationTurns%3===0)receiveDamage(c,6,null)}if(c.status.permaBurn){receiveDamage(c,c.status.permaBurn,null);c.status.permaBurn+=c.status.permaBurnStep||0}if(c.status.healTurns){c.hp=Math.min(c.baseHp,c.hp+3);c.status.healTurns--}})}
 function endRound(){S.round++;fxTurn();S.players.forEach(p=>{all(p).forEach(c=>{delete c.status.sandExtraUsed;tick(c)});applyStartRound(p)});S.players.forEach(p=>{if(p.leader?.name==="앙버터"){} });}
 function tick(c){if(c.cd>0)c.cd--;if(c.cd1>0)c.cd1--;if(c.cd2>0)c.cd2--;for(const k of ["stunTurns","dmgDownTurns","attackDownTurns","randomTargetTurns","invulnTurns","halfTurns","teamReduceTurns"])if(c.status[k]>0)c.status[k]--;if(c.status.stunTurns<=0)delete c.status.stunned;if(c.status.dmgDownTurns<=0)delete c.status.dmgDown;if(c.status.attackDownTurns<=0)delete c.status.attackDown;if(c.status.randomTargetTurns<=0)delete c.status.randomTarget;if(c.status.invulnTurns<=0){delete c.status.invulnTurns;delete c.status.invuln}if(c.status.halfTurns<=0)delete c.status.halfTurns;if(c.status.teamReduceTurns<=0)delete c.status.teamReduce}
-function finishAction(c,pi){clearPending();let p=S.players[pi];if(p.status.extraTeamAttack){delete p.status.extraTeamAttack;render();toast("돌이의 추가 공격 기회!");return}if(c.type==="leader"&&c.name==="모래"&&S.round%3===0&&uniformTopDeck(p,"땅")&&!c.status.sandExtraUsed){c.status.sandExtraUsed=true;c.status.extraAction=true}if(c.status.extraAction){delete c.status.extraAction;render();toast(c.name+" 추가 행동!");return}if(p.status.multiAttackStarted){delete p.status.multiAttackStarted;render();toast("스노우: 5회 연속 공격 시작");return}if(p.status.multiAttack>0){p.status.multiAttack--;if(p.status.multiAttack>0){render();toast("스노우 추가 공격 "+p.status.multiAttack+"회 남음");return}}if(c.status.extraAttack){delete c.status.extraAttack;render();toast(c.name+" 추가 공격 가능");return}let idx=S.initiative.indexOf(pi),next=S.initiative[(idx+1)%S.initiative.length];if(next===S.initiative[0]){S.turn++;endRound()}S.active=next;checkEnd();render();aiTurnIfNeeded()}
+function finishAction(c,pi){clearPending();let p=S.players[pi];if(!c){if(isAI(pi)){aiPassTurn(pi);return}return}if(p.status.extraTeamAttack){delete p.status.extraTeamAttack;render();toast("돌이의 추가 공격 기회!");if(isAI(pi))setTimeout(()=>aiTurnIfNeeded(),350);return}if(c.type==="leader"&&c.name==="모래"&&S.round%3===0&&uniformTopDeck(p,"땅")&&!c.status.sandExtraUsed){c.status.sandExtraUsed=true;c.status.extraAction=true}if(c.status.extraAction){delete c.status.extraAction;render();toast(c.name+" 추가 행동!");if(isAI(pi))setTimeout(()=>aiTurnIfNeeded(),350);return}if(p.status.multiAttackStarted){delete p.status.multiAttackStarted;render();toast("스노우: 5회 연속 공격 시작");if(isAI(pi))setTimeout(()=>aiTurnIfNeeded(),350);return}if(p.status.multiAttack>0){p.status.multiAttack--;if(p.status.multiAttack>0){render();toast("스노우 추가 공격 "+p.status.multiAttack+"회 남음");if(isAI(pi))setTimeout(()=>aiTurnIfNeeded(),350);return}}if(c.status.extraAttack){delete c.status.extraAttack;render();toast(c.name+" 추가 공격 가능");if(isAI(pi))setTimeout(()=>aiTurnIfNeeded(),350);return}let idx=S.initiative.indexOf(pi),next=S.initiative[(idx+1)%S.initiative.length];if(next===S.initiative[0]){S.turn++;endRound()}S.active=next;checkEnd();render();aiTurnIfNeeded()}
 function checkEnd(){let alivePlayers=S.players.filter(p=>alive(p).length>0);if(alivePlayers.length<=1){let w=alivePlayers[0];if(!w)return true;w.score++;w.coins+=5;log(w.name+" 전투 승리 · 승점 +1 · 코인 +5");if(w.score>=5){S.gameOver=true;S.phase="end";$("winner").innerHTML="🏆 <b>"+w.name+"</b> 승리!";go("end");return true}S.phase="shop";S.active=S.initiative[0];renderShop();return true}return false}
-function aiTurnIfNeeded(){if(S.phase!=="battle"||S.mode!=="pve"||S.active!==S.count-1)return false;setTimeout(()=>{if(S.phase!=="battle")return;let p=S.players[S.active],cs=alive(p);if(!cs.length){finishAction(p.leader,S.active);return}let c=cs.sort((a,b)=>b.star-a.star)[0];if(c.type==="leader")useLeader(c,S.active);else useCharacter(c,S.active)},450);return true}
+function aiTurnIfNeeded(){
+  if(S.phase!=="battle"||!isAI(S.active))return false;
+  const pi=S.active;
+  setTimeout(()=>{
+    if(S.phase!=="battle"||S.active!==pi)return;
+    const p=S.players[pi];
+    const usable=alive(p).filter(c=>c.cd<=0&&!c.status.stunned);
+    if(!usable.length){aiPassTurn(pi);return}
+    const leaders=usable.filter(c=>c.type==="leader");
+    const chars=usable.filter(c=>c.type==="character");
+    const scored=[...usable].map(c=>({c,score:aiCardScore(c,pi)})).sort((a,b)=>b.score-a.score);
+    const best=scored[0];
+    if(!best||best.score<0){aiPassTurn(pi);return}
+    toast("🤖 AI 판단 · "+best.c.name);
+    if(best.c.type==="leader")useLeader(best.c,pi);
+    else useCharacter(best.c,pi);
+  },650);
+  return true
+}
 function renderBattle(){
   go("battle");
   $("status").textContent="TURN "+S.turn+" · ROUND "+S.round;
