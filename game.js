@@ -183,7 +183,7 @@ function renderBattle(){
 
   $("arena").innerHTML=S.players.map((p,pi)=>{
     const cards=all(p).map(c=>{
-      let h=cardHTML(c,pi===S.active&&c.alive);
+      let h=cardHTML(c,(pi===S.active&&c.alive)||(S.pending&&selectableCards().has(c)));
       return h.replace('data-card="'+c.id+'"','data-card="'+c.id+'" data-pi="'+pi+'"');
     }).join("");
 
