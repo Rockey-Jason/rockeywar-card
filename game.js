@@ -174,7 +174,69 @@ function tick(c){if(c.cd>0)c.cd--;if(c.cd1>0)c.cd1--;if(c.cd2>0)c.cd2--;for(cons
 function finishAction(c,pi){clearPending();let p=S.players[pi];if(p.status.extraTeamAttack){delete p.status.extraTeamAttack;render();toast("돌이의 추가 공격 기회!");return}if(c.type==="leader"&&c.name==="모래"&&S.round%3===0&&uniformTopDeck(p,"땅")&&!c.status.sandExtraUsed){c.status.sandExtraUsed=true;c.status.extraAction=true}if(c.status.extraAction){delete c.status.extraAction;render();toast(c.name+" 추가 행동!");return}if(p.status.multiAttackStarted){delete p.status.multiAttackStarted;render();toast("스노우: 5회 연속 공격 시작");return}if(p.status.multiAttack>0){p.status.multiAttack--;if(p.status.multiAttack>0){render();toast("스노우 추가 공격 "+p.status.multiAttack+"회 남음");return}}if(c.status.extraAttack){delete c.status.extraAttack;render();toast(c.name+" 추가 공격 가능");return}let idx=S.initiative.indexOf(pi),next=S.initiative[(idx+1)%S.initiative.length];if(next===S.initiative[0]){S.turn++;endRound()}S.active=next;checkEnd();render();aiTurnIfNeeded()}
 function checkEnd(){let alivePlayers=S.players.filter(p=>alive(p).length>0);if(alivePlayers.length<=1){let w=alivePlayers[0];if(!w)return true;w.score++;w.coins+=5;log(w.name+" 전투 승리 · 승점 +1 · 코인 +5");if(w.score>=5){S.gameOver=true;$("winner").innerHTML="🏆 <b>"+w.name+"</b> 승리!";go("end");return true}S.phase="shop";S.active=S.initiative[0];renderShop();return true}return false}
 function aiTurnIfNeeded(){if(S.phase!=="battle"||S.mode!=="pve"||S.active!==S.count-1)return false;setTimeout(()=>{if(S.phase!=="battle")return;let p=S.players[S.active],cs=alive(p);if(!cs.length){finishAction(p.leader,S.active);return}let c=cs.sort((a,b)=>b.star-a.star)[0];if(c.type==="leader")useLeader(c,S.active);else useCharacter(c,S.active)},450);return true}
-function renderBattle(){go("battle");$("status").textContent="TURN "+S.turn+" · ROUND "+S.round;$("turn").textContent=S.turn+"턴";$("active").textContent=S.players[S.active].name+"의 행동";$("arena").innerHTML=S.players.map((p,pi)=>'<div class="player '+(pi===S.active?"active":"")+'"><div class="playerHead"><b>'+p.name+(pi===S.active?" · 행동 중":"")+'</b><span>◆ '+p.coins+" · 승점 "+p.score+"</span></div><div class=\"cards\">"+all(p).map(c=>{let h=cardHTML(c,pi===S.active&&c.alive);return h.replace('data-card="'+c.id+'"','data-card="'+c.id+'" data-pi="'+pi+'"')}).join("")+"</div><div class=\"mini\" style=\"margin-top:7px\">덱 '+p.deck.length+' · 예비 '+p.reserve.length+' · 버린 카드 '+p.discard.length+'</div></div>').join("");document.querySelectorAll("#arena .card.clickable").forEach(e=>e.onclick=()=>{if(S.pending){let c=all(S.players[+e.dataset.pi]).find(x=>x.id===e.dataset.card);if(selectableCards().has(c)){let x=S.pending;clearPending();x.cb({p:S.players[+e.dataset.pi],c});render();}return}let c=all(S.players[S.active]).find(x=>x.id===e.dataset.card);if(c?.alive)(c.type==="leader"?useLeader(c,S.active):useCharacter(c,S.active))});renderInventory();$("actions").innerHTML='<button class="btn" id="detailBtn">📋 전투 상태</button><button class="btn" id="endBtn">행동 종료</button>';$("endBtn").onclick=()=>finishAction(alive(S.players[S.active])[0]||S.players[S.active].leader,S.active);$("detailBtn").onclick=()=>showModal("현재 전투 상태",S.players.map(p=>"<h3>"+p.name+"</h3>"+cardList(p)).join(""))}
+function renderBattle(){
+  go("battle");
+  $("status").textContent="TURN "+S.turn+" · ROUND "+S.round;
+  $("turn").textContent=S.turn+"턴";
+  $("active").textContent=S.players[S.active].name+"의 행동";
+
+  $("arena").innerHTML=S.players.map((p,pi)=>{
+    const cards=all(p).map(c=>{
+      let h=cardHTML(c,pi===S.active&&c.alive);
+      return h.replace('data-card="'+c.id+'"','data-card="'+c.id+'" data-pi="'+pi+'"');
+    }).join("");
+
+    return '<div class="player '+(pi===S.active?"active":"")+'">'+
+      '<div class="playerHead"><b>'+p.name+(pi===S.active?" · 행동 중":"")+
+      '</b><span>◆ '+p.coins+" · 승점 "+p.score+
+      '</span></div><div class="cards">'+cards+
+      '</div><div class="mini" style="margin-top:7px">덱 '+p.deck.length+
+      ' · 예비 '+p.reserve.length+' · 버린 카드 '+p.discard.length+
+      '</div></div>';
+  }).join("");
+
+  document.querySelectorAll("#arena .card.clickable").forEach(e=>{
+    e.onclick=()=>{
+      if(S.pending){
+        const pi=+e.dataset.pi;
+        const c=all(S.players[pi]).find(x=>x.id===e.dataset.card);
+        if(c&&selectableCards().has(c)){
+          const pending=S.pending;
+          clearPending();
+          pending.cb({p:S.players[pi],c});
+          render();
+        }
+        return;
+      }
+
+      const c=all(S.players[S.active]).find(x=>x.id===e.dataset.card);
+      if(c?.alive){
+        if(c.type==="leader") useLeader(c,S.active);
+        else useCharacter(c,S.active);
+      }
+    };
+  });
+
+  renderInventory();
+
+  $("actions").innerHTML=
+    '<button class="btn" id="detailBtn">📋 전투 상태</button>'+
+    '<button class="btn" id="endBtn">행동 종료</button>';
+
+  $("endBtn").onclick=()=>{
+    finishAction(
+      alive(S.players[S.active])[0]||S.players[S.active].leader,
+      S.active
+    );
+  };
+
+  $("detailBtn").onclick=()=>{
+    showModal(
+      "현재 전투 상태",
+      S.players.map(p=>"<h3>"+p.name+"</h3>"+cardList(p)).join("")
+    );
+  };
+}
 function renderInventory(){let p=S.players[S.active];$("inventory").innerHTML=p.items.length?p.items.map((it,i)=>'<button class="itemBtn" data-i="'+i+'">🎴 '+it.name+'</button>').join(""):"<span class=\"mini\">보유 아이템 없음";$("inventory").querySelectorAll("button").forEach(b=>b.onclick=()=>useItem(p,p.items[+b.dataset.i]))}
 function drawChar(){return S.charDeck.pop()||cardFrom(C[Math.floor(Math.random()*C.length)])}
 function drawLeader(){return S.leaderDeck.pop()||null}
