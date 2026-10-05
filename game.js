@@ -134,7 +134,7 @@ else if(c.name==="대파"&&skill==="스킬 3"){if(c.qi>=20){foes.forEach(x=>{x.c
 function clearRemovable(c){for(const k of ["stunned","stunTurns","burn","burnTurns","bleed","poisoned","poisonTurns","attackDown","attackDownTurns","dmgDown","dmgDownTurns","randomTarget","randomTargetTurns","guard"])delete c.status[k]}
 function drawItem(){return S.itemDeck.pop()||{id:id(),name:I[Math.floor(Math.random()*I.length)][0],desc:""}}
 function useItem(p,item){let idx=p.items.indexOf(item);if(idx<0)return;const name=item.name;const foes=enemies(p.id),own=alive(p);
-const done=()=>{p.items.splice(idx,1);render();};
+const done=()=>{p.items.splice(idx,1);if(!checkEnd())render();};
 if(name==="폭탄")chooseTarget("폭탄",foes,x=>{receiveDamage(x.c,2,null);done()});
 else if(name==="방패")chooseOwn("방패",own,x=>{x.status.invuln=true;x.status.invulnTurns=1;done()});
 else if(name==="알약")chooseOwn("알약",own,x=>{x.hp=Math.min(x.baseHp,x.hp+1);done()});
