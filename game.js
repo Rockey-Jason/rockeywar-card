@@ -464,7 +464,8 @@ function renderBattle(){
         if(c&&selectableCards().has(c)){
           const pending=S.pending;
           clearPending();
-          pending.cb(c);
+          const callbackValue=pending.type==="target"?(pending.arr.find(x=>x&&x.c===c)||{p:S.players[pi],i:pi,c}):c;
+          pending.cb(callbackValue);
           render();
         }
         return;
