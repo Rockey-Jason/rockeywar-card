@@ -214,7 +214,9 @@ jobs:
             if (pve4State.length !== 4) throw new Error('4인 PvE 플레이어 수가 잘못되었습니다: ' + JSON.stringify(pve4State));
             const expectedNames = ['플레이어 1','AI 2','AI 3','AI 4'];
             pve4State.forEach((p, i) => {
-              if (p.name !== expectedNames[i] || p.chars !== 5 || p.leaders !== 0) {
+              // The active player header legitimately appends " · 행동 중".
+              const normalizedName = p.name.replace(/ · 행동 중$/, '');
+              if (normalizedName !== expectedNames[i] || p.chars !== 5 || p.leaders !== 0) {
                 throw new Error('4인 PvE 초기 상태가 잘못되었습니다: ' + JSON.stringify(pve4State));
               }
             });
