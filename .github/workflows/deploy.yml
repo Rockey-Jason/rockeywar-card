@@ -228,9 +228,9 @@ jobs:
               ...smoke.leaders.filter(x => !x.ok).map(x => '지도자 '+x.name+': '+x.error),
               ...smoke.items.filter(x => !x.ok).map(x => '아이템 '+x.name+': '+x.error)
             ];
-            if (smoke.characters.length < 40) throw new Error('캐릭터 스킬 테스트 수가 비정상적으로 적습니다: '+smoke.characters.length);
-            if (smoke.leaders.length !== 8) throw new Error('지도자 스킬 테스트 수가 8이 아닙니다: '+smoke.leaders.length);
-            if (!smoke.items.length) throw new Error('아이템 스킬 테스트가 실행되지 않았습니다.');
+            if (smoke.characters.length !== smoke.counts.characters) throw new Error('캐릭터 스킬 전체 테스트가 실행되지 않았습니다: '+smoke.characters.length+'/'+smoke.counts.characters);
+            if (smoke.leaders.length !== smoke.counts.leaders) throw new Error('지도자 스킬 전체 테스트가 실행되지 않았습니다: '+smoke.leaders.length+'/'+smoke.counts.leaders);
+            if (smoke.items.length !== smoke.counts.items) throw new Error('아이템 스킬 전체 테스트가 실행되지 않았습니다: '+smoke.items.length+'/'+smoke.counts.items);
             if (failedSmoke.length) throw new Error('핵심 스킬/아이템 테스트 실패: '+failedSmoke.join(' | '));
             console.log('[PLAYTEST] character skills tested:', smoke.characters.length);
             console.log('[PLAYTEST] leader skills tested:', smoke.leaders.length);
