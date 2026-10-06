@@ -275,7 +275,7 @@ jobs:
               leaders:p.querySelectorAll('.card.leader').length
             })));
             const expected3 = ['플레이어 1','AI 2','AI 3'];
-            if (pve3.length !== 3 || pve3.some((p,i) => p.name !== expected3[i] || p.chars !== 5 || p.leaders !== 0)) {
+            if (pve3.length !== 3 || pve3.some((p,i) => p.name.replace(/ · 행동 중$/, '') !== expected3[i] || p.chars !== 5 || p.leaders !== 0)) {
               throw new Error('3인 PvE 초기 상태가 잘못되었습니다: '+JSON.stringify(pve3));
             }
 
