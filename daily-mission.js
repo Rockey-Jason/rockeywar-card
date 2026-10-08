@@ -1,1 +1,17 @@
-import{createClient}from"https://esm.sh/@supabase/supabase-js@2";const supabasePromise=fetch("https://rockey-jason.github.io/doldol-site/index.html").then(r=>r.text()).then(html=>{const k=html.match(/scttowfhygcpdirrekqm[.]supabase[.]co",\s*"([^"]+)"/)?.[1];if(!k)throw new Error("Supabase config missing");return createClient("https://scttowfhygcpdirrekqm.supabase.co",k)});window.doriCompleteDailyMission=async key=>{try{const s=await supabasePromise;const{data,error}=await s.rpc("complete_daily_mission",{p_mission_key:key});if(error)throw error;if(data?.reward_coins)console.log("🎯 일일 미션 보상:",data.reward_coins);return data}catch(e){console.warn("daily mission unavailable",e);return null}};
+import{createClient}from"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+const SUPABASE_URL="https://scttowfhygcpdirrekqm.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_-ZvJjR5oRhWxGge0l-l86g_Nv0ttZLF";
+const supabase=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+window.doriCompleteDailyMission=async key=>{
+  try{
+    const{data,error}=await supabase.rpc("complete_daily_mission",{p_mission_key:key});
+    if(error)throw error;
+    console.log("🎯 일일 미션 완료:",key,data);
+    return data;
+  }catch(e){
+    console.warn("daily mission unavailable",e);
+    return null;
+  }
+};
